@@ -46,7 +46,7 @@ public class MassiveBody {
 	 * @param dist_y	Y-axis distance between this and the other MassiveBody object.
 	 * @return			The total distance between this and the other MassiveBody object.
 	 */
-	public static double calculateDistance(double dist_x, double dist_y) {
+	public double calculateDistance(double dist_x, double dist_y) {
 		return Math.sqrt((dist_x * dist_x) + (dist_y * dist_y));
 	}
 	

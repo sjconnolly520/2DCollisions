@@ -33,7 +33,6 @@ public class RenderingPanel extends JPanel{
 	public RenderingPanel(BodyCollector bodies) {
 		
 		
-		
 		b1 = new MassiveBody();
 
 		b1.setMass(100000);
