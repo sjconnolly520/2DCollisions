@@ -20,7 +20,7 @@ public class BodyCollector {
 	 */
 	public BodyCollector(boolean randomize) {
 		
-		System.out.println("How many bodies would you like to simulate?: ");
+		System.out.print("How many bodies would you like to simulate?: ");
 		numBodies = scanner.nextInt();
 		
 		if (randomize) {
@@ -39,35 +39,36 @@ public class BodyCollector {
 			MassiveBody newBody = new MassiveBody();
 			
 			// User prompts
-			System.out.println("What is the radius of body " + (i+1) + " (in meters)?: ");
+			System.out.print("What is the radius of body " + (i+1) + " (in meters)?: ");
 			float radius = scanner.nextFloat();
 			newBody.setRadius(radius);
 			
-			System.out.println("What is the mass of body " + (i+1) + " (in grams)?: ");
+			System.out.print("What is the mass of body " + (i+1) + " (in grams)?: ");
 			float mass = scanner.nextFloat();
 			newBody.setMass(mass);
 			
-			System.out.println("What is the x location of body " + (i+1) + "?: ");
+			System.out.print("What is the x location of body " + (i+1) + "?: ");
 			float xLoc = scanner.nextFloat();
 			newBody.setxPos(xLoc);
 			
-			System.out.println("What is the y location of body " + (i+1) + "?: ");
+			System.out.print("What is the y location of body " + (i+1) + "?: ");
 			float yLoc = scanner.nextFloat();
 			newBody.setyPos(yLoc);
 			
 			// While there is a location conflict with another body, ask the user for a new location
 			while (!isValidLocation(newBody)) {				
-				System.out.println("There is a conflict with another body at that location.");
+				System.out.println("There is a conflict with creating a body at that location.");
 				System.out.println("Please try another location.");
 				
-				System.out.println("What is the x location of body " + (i+1) + "?: ");
+				System.out.print("What is the x location of body " + (i+1) + "?: ");
 				xLoc = scanner.nextFloat();
 				newBody.setxPos(xLoc);
 				
-				System.out.println("What is the y location of body " + (i+1) + "?: ");
+				System.out.print("What is the y location of body " + (i+1) + "?: ");
 				yLoc = scanner.nextFloat();
 				newBody.setyPos(yLoc);
 			}
+	
 			bodies.add(newBody);
 		}
 		

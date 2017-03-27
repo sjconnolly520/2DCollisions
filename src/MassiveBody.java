@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 // Created 3/24/2017
 public class MassiveBody {
 
@@ -6,11 +8,16 @@ public class MassiveBody {
 	private double xVel = 0, yVel = 0; // velocities along x, y axes
 	private double xAcc = 0, yAcc = 0; // accelerations along x, y axes
 	private double mass = 1; // default = 1
-	private static final double G = 6.67 * Math.pow(10,-11); // Universal Gravitational Constant
+	private static final double G = 6.67 * Math.pow(10, -11); // Universal
+																// Gravitational
+																// Constant
+	private Color color;
 	private boolean stationary = false; // stationary body is centered during
 										// simulation; Likely just for testing
 
-	public MassiveBody() {  }
+	public MassiveBody() {
+		color = generateRandomColor();
+	}
 
 	/**
 	 * 
@@ -40,93 +47,97 @@ public class MassiveBody {
 
 	/**
 	 * 
-	 * Calculates the total distance between this and the other MassiveBody object.
+	 * Calculates the total distance between this and the other MassiveBody
+	 * object.
 	 * 
-	 * @param dist_x	X-axis distance between this and the other MassiveBody object.
-	 * @param dist_y	Y-axis distance between this and the other MassiveBody object.
-	 * @return			The total distance between this and the other MassiveBody object.
+	 * @param dist_x
+	 *            X-axis distance between this and the other MassiveBody object.
+	 * @param dist_y
+	 *            Y-axis distance between this and the other MassiveBody object.
+	 * @return The total distance between this and the other MassiveBody object.
 	 */
 	public double calculateDistance(double dist_x, double dist_y) {
 		return Math.sqrt((dist_x * dist_x) + (dist_y * dist_y));
 	}
-	
-	
+
 	/**
 	 * 
-	 * Calculates the acceleration of MassiveBody objects due to the gravity of other MassiveBody objects.
+	 * Calculates the acceleration of MassiveBody objects due to the gravity of
+	 * other MassiveBody objects.
 	 * 
-	 * @param other		The MassiveBody object which is exerting influence on this MassiveBody object
+	 * @param other
+	 *            The MassiveBody object which is exerting influence on this
+	 *            MassiveBody object
 	 */
 	public void calculateAcceleration(MassiveBody other) {
-		
+
 		// Calculate distance of this from other
 		double deltaX = calculateDistX(other);
 		double deltaY = calculateDistY(other);
 		double distance = calculateDistance(deltaX, deltaY);
-		
+
 		// Calculate axial forces on objects due to gravity
-		double gravForceMag = (G * mass * other.getMass()) / (distance * distance);			
+		double gravForceMag = (G * mass * other.getMass()) / (distance * distance);
 		double forceX = Math.abs(gravForceMag * (deltaX / distance));
 		double forceY = Math.abs(gravForceMag * (deltaY / distance));
-		
-		// Calculate axial accelerations due to gravity and add to current axial accelerations
-		// FIXME: Stephen feels certain that this can be made more efficient. Also, THIS DOESNT WORK!!!
-	    if (this.getxPos() < other.getxPos()) {
-	        this.addToXAcc(forceX / this.getMass());
-	        other.addToXAcc(-forceX / other.getMass());
-	    } 
-	    else {
-	        this.addToXAcc(-forceX / this.getMass());
-	        other.addToXAcc(forceX / other.getMass());
-	    }
 
-	    if (this.getyPos() < other.getyPos()) {
-	        this.addToYAcc(forceY / this.getMass());
-	        other.addToYAcc(-forceY / other.getMass());
-	    } 
-	    else {
-	        this.addToYAcc(-forceY / this.getMass());
-	        other.addToYAcc(forceY / other.getMass());
-	    }
-		
+		// Calculate axial accelerations due to gravity and add to current axial
+		// accelerations
+		// FIXME: Stephen feels certain that this can be made more efficient.
+		// Also, THIS DOESNT WORK!!!
+		if (this.getxPos() < other.getxPos()) {
+			this.addToXAcc(forceX / this.getMass());
+			other.addToXAcc(-forceX / other.getMass());
+		} else {
+			this.addToXAcc(-forceX / this.getMass());
+			other.addToXAcc(forceX / other.getMass());
+		}
+
+		if (this.getyPos() < other.getyPos()) {
+			this.addToYAcc(forceY / this.getMass());
+			other.addToYAcc(-forceY / other.getMass());
+		} else {
+			this.addToYAcc(-forceY / this.getMass());
+			other.addToYAcc(forceY / other.getMass());
+		}
+
 	}
-	
 
 	/**
 	 * 
-	 * Updates the axial velocities of this MassiveBody object based on the axial accelerations of the object.
-	 * Once new velocities are calculated, accelerations are set to 0.0.
+	 * Updates the axial velocities of this MassiveBody object based on the
+	 * axial accelerations of the object. Once new velocities are calculated,
+	 * accelerations are set to 0.0.
 	 * 
 	 */
 	public void calculateVelocity() {
-		setxVel(getxVel() + getxAcc() * 1000000);			// Times 1000000 for rendering purposes 
+		setxVel(getxVel() + getxAcc() * 1000000); // Times 1000000 for rendering
+													// purposes
 		setyVel(getyVel() + getyAcc() * 1000000);
-		
+
 		// Set the acceleration to 0 before the next set of calculations occur.
 		setxAcc(0.0);
 		setyAcc(0.0);
 	}
-	
+
 	/**
 	 * 
-	 * Updates the axial positions of this MassiveBody object based on the axial velocities of the object.
+	 * Updates the axial positions of this MassiveBody object based on the axial
+	 * velocities of the object.
 	 * 
 	 */
 	public void calculatePosition() {
 		setxPos(getxPos() + getxVel());
 		setyPos(getyPos() + getyVel());
 	}
-	
-	
+
 	public void addToXAcc(double changeInAcc) {
 		xAcc += changeInAcc;
 	}
-	
+
 	public void addToYAcc(double chanceInAcc) {
 		yAcc += chanceInAcc;
 	}
-	
-	
 
 	///////////////////////////
 	/// Getters and Setters ///
@@ -264,6 +275,31 @@ public class MassiveBody {
 	 */
 	public void setStationary(boolean stationary) {
 		this.stationary = stationary;
+	}
+
+	/**
+	 * @return The color of the object
+	 */
+	public Color getColor() {
+		return color;
+	}
+
+	/**
+	 * @param color
+	 *            The color of the object
+	 */
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	/**
+	 * @return A Random color for the object to be rendered in.
+	 */
+	public Color generateRandomColor() {
+		int R = (int) (Math.random() * 256);
+		int G = (int) (Math.random() * 256);
+		int B = (int) (Math.random() * 256);
+		return new Color(R, G, B);
 	}
 
 }
