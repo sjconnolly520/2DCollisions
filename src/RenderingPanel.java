@@ -22,56 +22,70 @@ public class RenderingPanel extends JPanel {
 	MassiveBody b1;
 	MassiveBody b2;
 	int timeStep;
-//	DeltaTime timer;
 	
-	// Note: 10ms was the default time step
-//	Timer timer; 
 	
-	Timer timer = new Timer(10, new ActionListener() {
-		
-		@Override
-		public void actionPerformed(ActionEvent e) {
-//			System.out.println("timeStep is " + timeStep);
-//			System.out.println("Timer triggered");
-			for (int i = 0; i < bodies.size() - 1; i++) {
-				for (int j = i + 1; j < bodies.size(); j++) {
-//					System.out.println("calculating acceleration");
-					bodies.get(i).calculateAcceleration(bodies.get(j));
+//	TODO wrap timer in something that checks to see if x number of time steps
+//	have occurred, then makes the Timer quit
+	
+//	used for initialization in constructor
+	Timer timer;
+	
+	// Note: 10ms was the default time step	
+//	Timer timer = new Timer(10, new ActionListener() {
+//		
+//		@Override
+//		public void actionPerformed(ActionEvent e) {
+////			System.out.println("timeStep is " + timeStep);
+////			System.out.println("Timer triggered");
+//			for (int i = 0; i < bodies.size() - 1; i++) {
+//				for (int j = i + 1; j < bodies.size(); j++) {
+////					bodies.get(i).calculateAcceleration(bodies.get(j));
 //					bodies.get(i).calculateForces(bodies.get(j));
-				}
-			}
-			
-			for (MassiveBody body : bodies) {
-				body.calculateVelocity();
-				body.calculatePosition();
+//				}
+//			}
+//			
+//			for (MassiveBody body : bodies) {
+////				body.calculateVelocity();
+////				TODO done separately below
+////				body.calculatePosition();
 //				body.moveBody();
-			}
-			
-			repaint();
-						
-		}
-	});
+//			}
+//			
+////			calculate position last
+////			for(MassiveBody body : bodies) {
+////				body.calculatePosition();
+////			}
+//			
+//			repaint();
+//						
+//		}
+//	});
 	
-//	Timer timer = new Timer(timeStep, new TimerListener());
-//	
+
 	class TimerListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("timeStep is " + timeStep);
-//			System.out.println("Timer triggered");
+//				System.out.println("timeStep is " + timeStep);
+//				System.out.println("Timer triggered");
 			for (int i = 0; i < bodies.size() - 1; i++) {
 				for (int j = i + 1; j < bodies.size(); j++) {
-					bodies.get(i).calculateAcceleration(bodies.get(j));
-//					bodies.get(i).calculateForces(bodies.get(j));
+//						bodies.get(i).calculateAcceleration(bodies.get(j));
+					bodies.get(i).calculateForces(bodies.get(j));
 				}
 			}
 			
 			for (MassiveBody body : bodies) {
-				body.calculateVelocity();
-				body.calculatePosition();
-//				body.moveBody();
+//					body.calculateVelocity();
+//					TODO done separately below
+//					body.calculatePosition();
+				body.moveBody();
 			}
+			
+//				calculate position last
+//				for(MassiveBody body : bodies) {
+//					body.calculatePosition();
+//				}
 			
 			repaint();
 		}
@@ -81,67 +95,23 @@ public class RenderingPanel extends JPanel {
 	public RenderingPanel(BodyCollector bodies) {
 		setBackground(Color.WHITE);
 		this.bodies = bodies.getListOfBodies();
-		
-//		for(MassiveBody body : this.bodies) {
-//			body.addObserver(this);
-//		}
 		this.timeStep = bodies.getTimeStep();
-//		timer = new Timer(timeStep, new TimerListener());
+//		TODO use this initialization if you want to have customized time steps
+		timer = new Timer(timeStep, new TimerListener());
 		timer.start();
 		
 	}
 	
-	
+	@Override
 	public void paintComponent(Graphics g) {
-//		System.out.println("in paintcomponent");
 		super.paintComponent(g);
-//		Graphics2D g2 = (Graphics2D) g;
 		
 		for (MassiveBody body : this.bodies) {
-			System.out.println("body x: " + body.getxPos() + " body y: " + body.getyPos());
 			g.setColor(body.getColor());
 			g.fillOval((int)body.getxPos(), (int)body.getyPos(), (int)body.getRadius(), (int)body.getRadius());
 		}
 		
-	}
-
-	
-//	class DeltaTime {
-//		
-//		private Timer timer;
-//		private int timeStep;
-//		
-//		public DeltaTime(int timeStep) {
-//			this.timeStep = timeStep;
-//			timer = new Timer();
-//			timer.schedule(new MoveTask(), 0, this.timeStep);
-//		}
-//		
-//		class MoveTask extends TimerTask {
-//
-//			@Override
-//			public void run() {
-//			System.out.println("Timer triggered");
-//			for (int i = 0; i < bodies.size() - 1; i++) {
-//				for (int j = i + 1; j < bodies.size(); j++) {
-//					bodies.get(i).calculateAcceleration(bodies.get(j));
-////					bodies.get(i).calculateForces(bodies.get(j));
-//				}
-//			}
-//			
-//			for (MassiveBody body : bodies) {
-//				body.calculateVelocity();
-//				body.calculatePosition();
-////				body.moveBody();
-//			}
-//			
-//			repaint();
-//				
-//			}
-//			
-//		}
-//	}
-	
+	}	
 }
 
 
