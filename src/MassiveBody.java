@@ -1,19 +1,24 @@
 import java.awt.Color;
+import java.awt.Point;
+import java.util.Observable;
 
 // Created 3/24/2017
 public class MassiveBody {
-
-	private double xPos, yPos; // position
-	private double radius; // dimensions for drawing
+	
+	private double xPos, yPos;         // position
+	private double radius;             // dimensions for drawing
 	private double xVel = 0, yVel = 0; // velocities along x, y axes
 	private double xAcc = 0, yAcc = 0; // accelerations along x, y axes
-	private double mass = 1; // default = 1
+	private double mass = 1;           // default = 1
 	private static final double G = 6.67 * Math.pow(10, -11); // Universal
 																// Gravitational
 																// Constant
 	private Color color;
 	private boolean stationary = false; // stationary body is centered during
 										// simulation; Likely just for testing
+	
+	private double xForce = 0, yForce = 0; // initial forces
+	private int name;
 
 	public MassiveBody() {
 		color = generateRandomColor();
@@ -70,16 +75,22 @@ public class MassiveBody {
 	 *            MassiveBody object
 	 */
 	public void calculateAcceleration(MassiveBody other) {
-
+		System.out.println("calculating acceleration");
 		// Calculate distance of this from other
 		double deltaX = calculateDistX(other);
 		double deltaY = calculateDistY(other);
 		double distance = calculateDistance(deltaX, deltaY);
+		
+//		TODO calculate whether distance < 2r here, and print a message
+//		if(distance < (other.radius + this.radius)){
+//			System.out.println("distance < 2r");
+//		back it up a time step
+//		}
 
 		// Calculate axial forces on objects due to gravity
 		double gravForceMag = (G * mass * other.getMass()) / (distance * distance);
 		double forceX = Math.abs(gravForceMag * (deltaX / distance));
-		double forceY = Math.abs(gravForceMag * (deltaY / distance));
+		double forceY = Math.abs(gravForceMag * (deltaY / distance));		
 
 		// Calculate axial accelerations due to gravity and add to current axial
 		// accelerations
@@ -102,6 +113,41 @@ public class MassiveBody {
 		}
 
 	}
+	
+	public void calculateForces(MassiveBody other) {
+		// Calculate distance of this from other
+		double deltaX = calculateDistX(other);
+		double deltaY = calculateDistY(other);
+		double distance = calculateDistance(deltaX, deltaY);
+		
+//		TODO calculate whether distance < 2r here, and print a message
+		if(distance < (other.radius + this.radius)){
+			System.out.println("distance < 2r");
+		}
+		
+		// Calculate axial forces on objects due to gravity
+		double gravForceMag = (G * mass * other.getMass()) / (distance * distance);
+		
+		double directionX = other.getxPos() - this.getxPos(); 
+//		System.out.println("directionX is " + directionX);
+		double directionY = other.getyPos() - this.getyPos();
+//		System.out.println("directionY is " + directionY);
+		
+		this.setXForce(this.getXForce() + gravForceMag*directionX/distance);
+//		System.out.println("this x force is " + this.getXForce());
+		other.setXForce(other.getXForce() - gravForceMag*directionX/distance);
+//		System.out.println("other x force is " + other.getXForce());
+		this.setYForce(this.getYForce() + gravForceMag*directionY/distance);
+//		System.out.println("this y force is " + this.getYForce());
+		other.setYForce(other.getYForce() - gravForceMag*directionY/distance);
+//		System.out.println("other y force is " + other.getYForce());
+		
+//		TODO decide if this is needed
+		this.addToXAcc(this.getXForce()/this.getMass());
+		other.addToXAcc(other.getXForce()/other.getMass());
+		this.addToYAcc(this.getYForce()/this.getMass());
+		other.addToYAcc(other.getYForce()/other.getMass());
+	}
 
 	/**
 	 * 
@@ -111,6 +157,7 @@ public class MassiveBody {
 	 * 
 	 */
 	public void calculateVelocity() {
+		
 		setxVel(getxVel() + getxAcc() * 1000000); // Times 1000000 for rendering
 													// purposes
 		setyVel(getyVel() + getyAcc() * 1000000);
@@ -129,6 +176,34 @@ public class MassiveBody {
 	public void calculatePosition() {
 		setxPos(getxPos() + getxVel());
 		setyPos(getyPos() + getyVel());
+	}
+	
+	public void moveBody() {
+//		TODO decide if timeStep needs to be multiplied by .001
+//		double xDeltaV = this.getXForce()/this.getMass()* BodyCollector.timeStep;
+		double xDeltaV = (this.getXForce()/this.getMass())*1000;
+//		double yDeltaV = this.getYForce()/this.getMass()* BodyCollector.timeStep;
+		double yDeltaV = (this.getYForce()/this.getMass())*1000;
+//		double xDeltaP = (this.getxVel() + (xDeltaV/2)) * BodyCollector.timeStep;
+		double xDeltaP = ((this.getxVel() + (xDeltaV/2)))*1000;
+//		double yDeltaP = (this.getyVel() + (yDeltaV/2)) * BodyCollector.timeStep;
+		double yDeltaP = ((this.getyVel() + (yDeltaV/2)))*1000;
+		
+		
+	//	set this body's velocity
+		this.setxVel(this.getxVel() + xDeltaV);
+//		System.out.println("velocity X is " + this.getxVel());
+		this.setyVel(this.getyVel() + yDeltaV);
+//		System.out.println("velocity Y is " + this.getyVel());
+		
+//		set this body's position
+		this.setxPos(this.getxPos() + xDeltaV);
+//		System.out.println("pos x is " + this.getxPos());
+		this.setyPos(this.getyPos() + yDeltaV);
+//		System.out.println("pos y is " + this.getyPos());
+		
+		this.setXForce(0.0);
+		this.setYForce(0.0);
 	}
 
 	public void addToXAcc(double changeInAcc) {
@@ -260,6 +335,44 @@ public class MassiveBody {
 	 */
 	public void setMass(double mass) {
 		this.mass = mass;
+	}
+	
+	/**
+	 * @return the force for x
+	 */
+	public double getXForce() {
+		return xForce;
+	}
+
+	/**
+	 * @param mass
+	 *            the force for x to set
+	 */
+	public void setXForce(double force) {
+		this.xForce = force;
+	}	
+	
+	/**
+	 * @return the force for y
+	 */
+	public double getYForce() {
+		return yForce;
+	}
+
+	/**
+	 * @param mass
+	 *            the force for y to set
+	 */
+	public void setYForce(double force) {
+		this.yForce = force;
+	}
+	
+	public int getName(){
+		return this.name;
+	}
+	
+	public void setName(int name) {
+		this.name = name;
 	}
 
 	/**

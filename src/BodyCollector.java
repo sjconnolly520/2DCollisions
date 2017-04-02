@@ -1,11 +1,13 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 import java.util.Random;
 import java.util.Scanner;
 
 public class BodyCollector {
 	
-	List<MassiveBody> bodies = new ArrayList<>();
+	static int timeStep;              // time step for this simulation
+	private List<MassiveBody> bodies = new ArrayList<>();
 	int numBodies;
 	Scanner scanner = new Scanner(System.in);
 	final double minMass = 50000, maxMass = 500000;
@@ -23,6 +25,9 @@ public class BodyCollector {
 		System.out.print("How many bodies would you like to simulate?: ");
 		numBodies = scanner.nextInt();
 		
+		System.out.print("What time step do you want (in ms)?: ");
+		timeStep = scanner.nextInt();
+		
 		if (randomize) {
 			generateRandomBodies();
 		}
@@ -32,11 +37,13 @@ public class BodyCollector {
 	}
 	
 	/**
-	 * Promts the user for required information for each of the bodies he/she wants to simulate.
+	 * Prompts the user for required information for each of the bodies he/she wants to simulate.
 	 */
 	private void getUserBodyData() {
+		
 		for (int i = 0; i < numBodies; i++) {
 			MassiveBody newBody = new MassiveBody();
+			newBody.setName(i);
 			
 			// User prompts
 			System.out.print("What is the radius of body " + (i+1) + " (in meters)?: ");
@@ -167,6 +174,14 @@ public class BodyCollector {
 	 */
 	public void addToListOfBodies(MassiveBody newBody) {
 		bodies.add(newBody);
+	}
+	
+	/**
+	 * @return     Returns the time step for this simulation
+	 * @return
+	 */
+	public int getTimeStep() {
+		return timeStep;
 	}
 
 }
