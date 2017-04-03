@@ -28,6 +28,7 @@ public class BodyCollector {
 		System.out.print("How many bodies would you like to simulate?: ");
 		numBodies = scanner.nextInt();
 		
+//		NOTE extra questions added by Bree
 		System.out.print("What time step do you want (in ms)?: ");
 		timeStep = scanner.nextInt();
 		

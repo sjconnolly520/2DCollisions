@@ -5,22 +5,25 @@ import java.util.Observable;
 // Created 3/24/2017
 public class MassiveBody {
 	
-	private double xPos, yPos;         // position
-	private double radius;             // dimensions for drawing
-	private double xVel = 0, yVel = 0; // velocities along x, y axes
-	private double xAcc = 0, yAcc = 0; // accelerations along x, y axes
-	private double mass = 1;           // default = 1
+	private double xPos, yPos;             // position
+	private double radius;                 // dimensions for drawing
+	private double xVel = 0, yVel = 0;     // velocities along x, y axes
+	private double xAcc = 0, yAcc = 0;     // accelerations along x, y axes
+	private double mass = 1;               // default = 1
 	private static final double G = 6.67 * Math.pow(10, -11); // Universal
 																// Gravitational
 																// Constant
 	private Color color;
-	private boolean stationary = false; // stationary body is centered during
-										// simulation; Likely just for testing
+	private boolean stationary = false;    // stationary body is centered during
+										   // simulation; Likely just for testing
 	
+//	NOTE added by Bree
 	private double xForce = 0, yForce = 0; // initial forces
 	private int name;                      // TODO for identifying a body
-	private int timeStep;
+	private int timeStep;                  // the specified timeStep
 
+//	NOTE Bree added the timeStep to the constructor so it could do the proper calculations
+//	in the added functions
 	public MassiveBody(int timeStep) {
 		color = generateRandomColor();
 		this.timeStep = timeStep;
@@ -111,13 +114,23 @@ public class MassiveBody {
 
 	}
 	
+	/**
+	 * 
+	 * Calculates the forces affecting MassiveBody objects due to the presence of
+	 * other MassiveBody objects. ADDED BY BREE TO MIRROR THE BOOK EXAMPLE
+	 * 
+	 * @param other
+	 *            The MassiveBody object which is exerting influence on this
+	 *            MassiveBody object
+	 */
 	public void calculateForces(MassiveBody other) {
 		// Calculate distance of this from other
 		double deltaX = calculateDistX(other);
 		double deltaY = calculateDistY(other);
 		double distance = calculateDistance(deltaX, deltaY);
 		
-//		TODO calculate whether distance < some small number here, and handle accordingly
+//		calculate whether distance < some small number here, and handle accordingly
+//		TODO figure out what this small number should be
 		if(distance <= radius){
 			System.out.println("collision detected");
 //			TODO back up a time step?
@@ -207,6 +220,12 @@ public class MassiveBody {
 		setyPos(getyPos() + getyVel());
 	}
 	
+	/**
+	 * 
+	 * Updates the velocities and axial positions of this MassiveBody object based on 
+	 * the forces affecting the object. ADDED BY BREE TO REFLECT THE BOOK EXAMPLE
+	 * 
+	 */
 	public void moveBody() {
 //		multiplied by 1000 to scale, otherwise it doesn't move very fast
 		double xDeltaV = (this.getXForce()/this.getMass())*timeStep*1000;

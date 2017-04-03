@@ -11,8 +11,7 @@ import java.util.Observer;
 import javax.swing.JPanel;
 
 import javax.swing.Timer;
-//import java.util.Timer;
-//import java.util.TimerTask;
+
 
 public class RenderingPanel extends JPanel {
 
@@ -61,16 +60,15 @@ public class RenderingPanel extends JPanel {
 //		}
 //	});
 	
-
+//	NOTE added by Bree to incorporate choice of timeStep
 	class TimerListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-//				System.out.println("timeStep is " + timeStep);
-//				System.out.println("Timer triggered");
+
 			for (int i = 0; i < bodies.size() - 1; i++) {
 				for (int j = i + 1; j < bodies.size(); j++) {
-//						bodies.get(i).calculateAcceleration(bodies.get(j));
+//					bodies.get(i).calculateAcceleration(bodies.get(j));
 					bodies.get(i).calculateForces(bodies.get(j));
 				}
 			}
@@ -96,7 +94,7 @@ public class RenderingPanel extends JPanel {
 		setBackground(Color.WHITE);
 		this.bodies = bodies.getListOfBodies();
 		this.timeStep = bodies.getTimeStep();
-//		TODO use this initialization if you want to have customized time steps
+//		had to use this initialization to have customized time steps
 		timer = new Timer(timeStep, new TimerListener());
 		timer.start();
 		
