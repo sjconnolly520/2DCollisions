@@ -24,9 +24,10 @@ public class MassiveBody {
 
 //	NOTE Bree added the timeStep to the constructor so it could do the proper calculations
 //	in the added functions
-	public MassiveBody(int timeStep) {
+	public MassiveBody(int timeStep, int name) {
 		color = generateRandomColor();
 		this.timeStep = timeStep;
+		this.name = name;
 	}
 
 	/**
@@ -68,6 +69,10 @@ public class MassiveBody {
 	 */
 	public double calculateDistance(double dist_x, double dist_y) {
 		return Math.sqrt((dist_x * dist_x) + (dist_y * dist_y));
+	}
+	
+	public double newCalculateDistance(MassiveBody other) {
+		return Math.sqrt(((this.getxPos() - other.getxPos()) * (this.getxPos() - other.getxPos())) + ((this.getyPos() - other.getyPos()) * (this.getyPos() - other.getyPos())));
 	}
 
 	/**
@@ -124,17 +129,21 @@ public class MassiveBody {
 	 *            MassiveBody object
 	 */
 	public void calculateForces(MassiveBody other) {
+//	public void calculateForces(int ID) {
 		// Calculate distance of this from other
-		double deltaX = calculateDistX(other);
-		double deltaY = calculateDistY(other);
-		double distance = calculateDistance(deltaX, deltaY);
+//		double deltaX = calculateDistX(other);
+//		double deltaY = calculateDistY(other);
+//		double distance = calculateDistance(deltaX, deltaY);
+		double distance = newCalculateDistance(other);
 		
 //		calculate whether distance < some small number here, and handle accordingly
 //		TODO figure out what this small number should be
-		if(distance <= radius){
+		if(distance <= (2*radius)){
 			System.out.println("collision detected");
 //			TODO back up a time step?
 //			recalculate velocities using collision equations
+			
+//			what is the distance? is it < 2r? if so, reset positions as if they were 2r apart
 			
 //			compute x- and y-velocities for this body after collision
 //			NOTE Bree has no idea how to make this look nicer
@@ -413,6 +422,14 @@ public class MassiveBody {
 	
 	public void setName(int name) {
 		this.name = name;
+	}
+	
+	public double getXPosForDrawing() {
+		return this.xPos - this.radius;
+	}
+	
+	public double getYPosForDrawing() {
+		return this.yPos - this.radius;
 	}
 
 	/**
