@@ -89,7 +89,7 @@ public class RenderFrame {
 					endBody = startBody + numBodiesPerWorker - 1;
 				}
 				
-				workers[i] = new Worker(i, bodies, forceMatrix, startBody, endBody+1, barrier, numWorkers);		// FIXME: Might be endBody (not +1)
+				workers[i] = new Worker(i, bodies, forceMatrix, startBody, endBody+1, barrier, numWorkers);
 				numBodiesDistributed = endBody + 1;
 				
 			}

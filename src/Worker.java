@@ -155,8 +155,8 @@ public class Worker extends Thread {
 				forceMatrix[ID][i].setLocation(newXFirst, newYFirst);
 
 				// update force for second body
-				double newXSecond = forceMatrix[ID][j].getX() + gravForceMag * directionX / distance;
-				double newYSecond = forceMatrix[ID][j].getY() + gravForceMag * directionY / distance;
+				double newXSecond = forceMatrix[ID][j].getX() - gravForceMag * directionX / distance;
+				double newYSecond = forceMatrix[ID][j].getY() - gravForceMag * directionY / distance;
 				forceMatrix[ID][j].setLocation(newXSecond, newYSecond);
 
 			}

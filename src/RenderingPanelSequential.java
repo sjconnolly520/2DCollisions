@@ -53,6 +53,7 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 	
 //	used for initialization in constructor
 	Timer timer;
+
 	class TimerListener implements ActionListener {
 
 		@Override

@@ -59,7 +59,7 @@ public class BodyCollector extends Observable{
 	private void getUserBodyData() {
 		
 		for (int i = 0; i < numBodies; i++) {
-			MassiveBody newBody = new MassiveBody(timeStep, i);
+			MassiveBody newBody = new MassiveBody(timeStep, i, wallCollisions);
 			newBody.setName(i);
 			
 			// User prompts
@@ -102,7 +102,7 @@ public class BodyCollector extends Observable{
 		Random rng = new Random();			// Random number generator
 		
 		for (int i = 0; i < numBodies; i++) {
-			MassiveBody newBody = new MassiveBody(timeStep, i);
+			MassiveBody newBody = new MassiveBody(timeStep, i, wallCollisions);
 			
 			// Generate random value for MassiveBody's mass
 			newBody.setMass(rng.nextDouble() * (maxMass - minMass) + minMass);
