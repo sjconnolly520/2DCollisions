@@ -1,22 +1,32 @@
 import java.awt.Color;
+import java.awt.Point;
+import java.util.Observable;
 
 // Created 3/24/2017
 public class MassiveBody {
-
-	private double xPos, yPos; // position
-	private double radius; // dimensions for drawing
-	private double xVel = 0, yVel = 0; // velocities along x, y axes
-	private double xAcc = 0, yAcc = 0; // accelerations along x, y axes
-	private double mass = 1; // default = 1
+	
+	private double xPos, yPos;             // position
+	private double radius;                 // dimensions for drawing
+	private double xVel = 0, yVel = 0;     // velocities along x, y axes
+	private double xAcc = 0, yAcc = 0;     // accelerations along x, y axes
+	private double mass = 1;               // default = 1
 	private static final double G = 6.67 * Math.pow(10, -11); // Universal
 																// Gravitational
 																// Constant
 	private Color color;
-	private boolean stationary = false; // stationary body is centered during
-										// simulation; Likely just for testing
+	private boolean stationary = false;    // stationary body is centered during
+										   // simulation; Likely just for testing
+	
+//	NOTE added by Bree
+	private double xForce = 0, yForce = 0; // initial forces
+	private int name;                      // TODO for identifying a body
+	private int timeStep;                  // the specified timeStep
 
-	public MassiveBody() {
+//	NOTE Bree added the timeStep to the constructor so it could do the proper calculations
+//	in the added functions
+	public MassiveBody(int timeStep) {
 		color = generateRandomColor();
+		this.timeStep = timeStep;
 	}
 
 	/**
@@ -75,11 +85,12 @@ public class MassiveBody {
 		double deltaX = calculateDistX(other);
 		double deltaY = calculateDistY(other);
 		double distance = calculateDistance(deltaX, deltaY);
+		
 
 		// Calculate axial forces on objects due to gravity
 		double gravForceMag = (G * mass * other.getMass()) / (distance * distance);
 		double forceX = Math.abs(gravForceMag * (deltaX / distance));
-		double forceY = Math.abs(gravForceMag * (deltaY / distance));
+		double forceY = Math.abs(gravForceMag * (deltaY / distance));		
 
 		// Calculate axial accelerations due to gravity and add to current axial
 		// accelerations
@@ -102,6 +113,83 @@ public class MassiveBody {
 		}
 
 	}
+	
+	/**
+	 * 
+	 * Calculates the forces affecting MassiveBody objects due to the presence of
+	 * other MassiveBody objects. ADDED BY BREE TO MIRROR THE BOOK EXAMPLE
+	 * 
+	 * @param other
+	 *            The MassiveBody object which is exerting influence on this
+	 *            MassiveBody object
+	 */
+	public void calculateForces(MassiveBody other) {
+		// Calculate distance of this from other
+		double deltaX = calculateDistX(other);
+		double deltaY = calculateDistY(other);
+		double distance = calculateDistance(deltaX, deltaY);
+		
+//		calculate whether distance < some small number here, and handle accordingly
+//		TODO figure out what this small number should be
+		if(distance <= radius){
+			System.out.println("collision detected");
+//			TODO back up a time step?
+//			recalculate velocities using collision equations
+			
+//			compute x- and y-velocities for this body after collision
+//			NOTE Bree has no idea how to make this look nicer
+			double v1fx = (((other.getxVel() * (other.getxPos() - this.getxPos()) * (other.getxPos() - 
+					this.getxPos())) + (other.getyVel() * (other.getxPos() - this.getxPos()) *
+					(other.getyPos() - this.getyPos()))) + ((this.getxVel() * (other.getyPos() -
+					this.getyPos()) * (other.getyPos() - this.getyPos())) - (this.getyVel() *
+					(other.getxPos() - this.getxPos()) * (other.getyPos() - this.getyPos())))) / 
+					(((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())) +
+					((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
+			
+			double v1fy = (((other.getxVel() * ((other.getxPos() - this.getxPos()) * (other.getyPos() - 
+					this.getyPos())) + (other.getyVel() * (other.getyPos() - this.getyPos()) * 
+					(other.getyPos() - this.getyPos())))) - ((this.getxVel() * (other.getyPos() -
+					this.getyPos()) * (other.getxPos() - this.getxPos())) + (this.getyVel() *
+					(other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())))) / 
+					(((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())) +
+					((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
+			
+//			compute x- and y-velocities for other body after collision
+			double v2fx = (((this.getxVel() * ((other.getxPos() - this.getxPos()) * (other.getxPos() - 
+					this.getxPos())) + (this.getyVel() * (other.getxPos() - this.getxPos()) * 
+					(other.getyPos() - this.getyPos())))) + ((other.getxVel() * (other.getyPos() -
+					this.getyPos()) * (other.getyPos() - this.getyPos())) - (other.getyVel() *
+					(other.getxPos() - this.getxPos()) * (other.getyPos() - this.getyPos())))) / 
+					(((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())) +
+					((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
+
+			double v2fy = (((this.getxVel() * ((other.getxPos() - this.getxPos()) * (other.getyPos() - 
+					this.getyPos())) + (this.getyVel() * (other.getyPos() - this.getyPos()) * 
+					(other.getyPos() - this.getyPos())))) - ((other.getxVel() * (other.getyPos() -
+					this.getyPos()) * (other.getxPos() - this.getxPos())) + (other.getyVel() *
+					(other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())))) / 
+					(((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())) +
+					((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
+			
+//			update velocities
+			this.setxVel(v1fx);
+			this.setyVel(v1fy);
+			other.setxVel(v2fx);
+			other.setyVel(v2fy);
+		}
+				
+		// Calculate axial forces on objects due to gravity
+		double gravForceMag = (G * mass * other.getMass()) / (distance * distance);
+		
+		double directionX = other.getxPos() - this.getxPos(); 
+		double directionY = other.getyPos() - this.getyPos();
+		
+		this.setXForce(this.getXForce() + gravForceMag*directionX/distance);
+		other.setXForce(other.getXForce() - gravForceMag*directionX/distance);
+		this.setYForce(this.getYForce() + gravForceMag*directionY/distance);
+		other.setYForce(other.getYForce() - gravForceMag*directionY/distance);
+
+	}
 
 	/**
 	 * 
@@ -111,6 +199,7 @@ public class MassiveBody {
 	 * 
 	 */
 	public void calculateVelocity() {
+		
 		setxVel(getxVel() + getxAcc() * 1000000); // Times 1000000 for rendering
 													// purposes
 		setyVel(getyVel() + getyAcc() * 1000000);
@@ -129,6 +218,32 @@ public class MassiveBody {
 	public void calculatePosition() {
 		setxPos(getxPos() + getxVel());
 		setyPos(getyPos() + getyVel());
+	}
+	
+	/**
+	 * 
+	 * Updates the velocities and axial positions of this MassiveBody object based on 
+	 * the forces affecting the object. ADDED BY BREE TO REFLECT THE BOOK EXAMPLE
+	 * 
+	 */
+	public void moveBody() {
+//		multiplied by 1000 to scale, otherwise it doesn't move very fast
+		double xDeltaV = (this.getXForce()/this.getMass())*timeStep*1000;
+		double yDeltaV = (this.getYForce()/this.getMass())*timeStep*1000;
+		double xDeltaP = ((this.getxVel() + (xDeltaV/2)))*timeStep*1000;
+		double yDeltaP = ((this.getyVel() + (yDeltaV/2)))*timeStep*1000;
+		
+		
+	//	set this body's velocity
+		this.setxVel(this.getxVel() + xDeltaV);
+		this.setyVel(this.getyVel() + yDeltaV);
+		
+//		set this body's position
+		this.setxPos(this.getxPos() + xDeltaP);
+		this.setyPos(this.getyPos() + yDeltaP);
+		
+		this.setXForce(0.0);
+		this.setYForce(0.0);
 	}
 
 	public void addToXAcc(double changeInAcc) {
@@ -260,6 +375,44 @@ public class MassiveBody {
 	 */
 	public void setMass(double mass) {
 		this.mass = mass;
+	}
+	
+	/**
+	 * @return the force for x
+	 */
+	public double getXForce() {
+		return xForce;
+	}
+
+	/**
+	 * @param mass
+	 *            the force for x to set
+	 */
+	public void setXForce(double force) {
+		this.xForce = force;
+	}	
+	
+	/**
+	 * @return the force for y
+	 */
+	public double getYForce() {
+		return yForce;
+	}
+
+	/**
+	 * @param mass
+	 *            the force for y to set
+	 */
+	public void setYForce(double force) {
+		this.yForce = force;
+	}
+	
+	public int getName(){
+		return this.name;
+	}
+	
+	public void setName(int name) {
+		this.name = name;
 	}
 
 	/**

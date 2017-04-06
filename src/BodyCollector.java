@@ -1,11 +1,16 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 import java.util.Random;
 import java.util.Scanner;
 
 public class BodyCollector {
 	
-	List<MassiveBody> bodies = new ArrayList<>();
+	private int timeStep;              // time step for this simulation
+	private int numSteps;              // the number of time steps for this simulation
+	private double mass;                  // the mass of each body
+	private double radius;                // the radius of each body
+	private List<MassiveBody> bodies = new ArrayList<>();
 	int numBodies;
 	Scanner scanner = new Scanner(System.in);
 	final double minMass = 50000, maxMass = 500000;
@@ -23,6 +28,17 @@ public class BodyCollector {
 		System.out.print("How many bodies would you like to simulate?: ");
 		numBodies = scanner.nextInt();
 		
+//		NOTE extra questions added by Bree
+		System.out.print("What time step do you want (in ms)?: ");
+		timeStep = scanner.nextInt();
+		
+		System.out.print("What is the radius of the bodies (in meters)?: ");
+		radius = scanner.nextFloat();
+		
+		System.out.print("What is the mass of the bodies (in grams)?: ");
+		mass = scanner.nextFloat();
+		
+		
 		if (randomize) {
 			generateRandomBodies();
 		}
@@ -32,19 +48,21 @@ public class BodyCollector {
 	}
 	
 	/**
-	 * Promts the user for required information for each of the bodies he/she wants to simulate.
+	 * Prompts the user for required information for each of the bodies he/she wants to simulate.
 	 */
 	private void getUserBodyData() {
+		
 		for (int i = 0; i < numBodies; i++) {
-			MassiveBody newBody = new MassiveBody();
+			MassiveBody newBody = new MassiveBody(timeStep);
+			newBody.setName(i);
 			
 			// User prompts
-			System.out.print("What is the radius of body " + (i+1) + " (in meters)?: ");
-			float radius = scanner.nextFloat();
+//			System.out.print("What is the radius of body " + (i+1) + " (in meters)?: ");
+//			float radius = scanner.nextFloat();
 			newBody.setRadius(radius);
 			
-			System.out.print("What is the mass of body " + (i+1) + " (in grams)?: ");
-			float mass = scanner.nextFloat();
+//			System.out.print("What is the mass of body " + (i+1) + " (in grams)?: ");
+//			float mass = scanner.nextFloat();
 			newBody.setMass(mass);
 			
 			System.out.print("What is the x location of body " + (i+1) + "?: ");
@@ -82,7 +100,7 @@ public class BodyCollector {
 		Random rng = new Random();			// Random number generator
 		
 		for (int i = 0; i < numBodies; i++) {
-			MassiveBody newBody = new MassiveBody();
+			MassiveBody newBody = new MassiveBody(timeStep);
 			
 			// Generate random value for MassiveBody's mass
 			newBody.setMass(rng.nextDouble() * (maxMass - minMass) + minMass);
@@ -167,6 +185,14 @@ public class BodyCollector {
 	 */
 	public void addToListOfBodies(MassiveBody newBody) {
 		bodies.add(newBody);
+	}
+	
+	/**
+	 * @return     Returns the time step for this simulation
+	 * @return
+	 */
+	public int getTimeStep() {
+		return timeStep;
 	}
 
 }
