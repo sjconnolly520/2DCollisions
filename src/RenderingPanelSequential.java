@@ -76,7 +76,7 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 			
 			if (initializedBodies.wallCollisonsActive()) {
 				for (MassiveBody body : bodies) {
-					body.checkForWallCollision(WIDTH, HEIGHT);
+					body.checkForWallCollision();
 				}
 			}
 			

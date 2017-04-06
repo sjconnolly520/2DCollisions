@@ -5,6 +5,9 @@ import java.util.Observable;
 // Created 3/24/2017
 public class MassiveBody extends Observable{
 	
+	final static int WIDTH = 620;
+	final static int HEIGHT = 520;
+	
 	private double xPos, yPos;             // position
 	private double radius;                 // dimensions for drawing
 	private double xVel = 0, yVel = 0;     // velocities along x, y axes
@@ -269,6 +272,7 @@ public class MassiveBody extends Observable{
 	public void setPosXY(double xPos, double yPos) {
 		this.xPos = xPos;
 		this.yPos = yPos;
+		checkForWallCollision();
 		setChanged();
 		notifyObservers();
 	}
@@ -480,16 +484,16 @@ public class MassiveBody extends Observable{
 		return new Color(R, G, B);
 	}
 
-	public void checkForWallCollision(int frameWidth, int frameHeight) {
+	public void checkForWallCollision() {
 		
 		if (xPos < (radius)) {
 			xVel *= -1;
 			xPos = 0.1 + radius;
 		}
 		
-		else if (xPos > (frameWidth - radius)) {
+		else if (xPos > (WIDTH - radius)) {
 			xVel *= -1;
-			xPos = frameWidth - radius - 0.1;
+			xPos = WIDTH - radius - 0.1;
 		}
 		
 		if (yPos < (radius)) {
@@ -497,9 +501,9 @@ public class MassiveBody extends Observable{
 			yPos = 0.1 + radius;
 		}
 		
-		else if (yPos > (frameHeight - radius)) {
+		else if (yPos > (HEIGHT - radius)) {
 			yVel *= -1;
-			yPos = frameHeight - radius - 0.1;
+			yPos = HEIGHT - radius - 0.1;
 		}
 		
 	}
