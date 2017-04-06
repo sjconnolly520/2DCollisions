@@ -12,8 +12,8 @@ public class BodyCollector extends Observable{
 	private double radius;                // the radius of each body
 	private int numWorkers;               // number of workers for this simulation
 	private List<MassiveBody> bodies = new ArrayList<>();
-	int numBodies;
-	Scanner scanner = new Scanner(System.in);
+	private int numBodies;
+	private Scanner scanner = new Scanner(System.in);
 	final double minMass = 50000, maxMass = 500000;
 	final double minRadius = 10, maxRadius = 200;
 	final int WIDTH = 620, HEIGHT = 520;
@@ -24,14 +24,15 @@ public class BodyCollector extends Observable{
 	 * 
 	 * @param randomize		Boolean value describing whether the user wants to generate MassiveBody objects randomly or generate them based on specific values. 
 	 */
-	public BodyCollector(boolean randomize) {
+	public BodyCollector(boolean randomize, int numBodies) {
 				
 //		NOTE extra questions added by Bree
-		System.out.print("How many workers do you want?: ");
-		numWorkers = scanner.nextInt();
+//		System.out.print("How many workers do you want?: ");
+//		numWorkers = scanner.nextInt();
 		
-		System.out.print("How many bodies would you like to simulate?: ");
-		numBodies = scanner.nextInt();
+//		System.out.print("How many bodies would you like to simulate?: ");
+//		numBodies = scanner.nextInt();
+		this.numBodies = numBodies;
 		
 		System.out.print("What is the radius of the bodies (in meters)?: ");
 		radius = scanner.nextFloat();

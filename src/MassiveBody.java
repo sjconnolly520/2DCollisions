@@ -3,7 +3,7 @@ import java.awt.Point;
 import java.util.Observable;
 
 // Created 3/24/2017
-public class MassiveBody {
+public class MassiveBody extends Observable{
 	
 	private double xPos, yPos;             // position
 	private double radius;                 // dimensions for drawing
@@ -266,6 +266,14 @@ public class MassiveBody {
 	///////////////////////////
 	/// Getters and Setters ///
 	///////////////////////////
+	public void setPosXY(double xPos, double yPos) {
+		this.xPos = xPos;
+		this.yPos = yPos;
+		setChanged();
+		notifyObservers();
+	}
+	
+	
 	/**
 	 * @return the yPos
 	 */

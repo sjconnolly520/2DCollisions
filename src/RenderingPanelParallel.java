@@ -121,7 +121,6 @@ public class RenderingPanelParallel extends JPanel implements Observer{
 	@Override
 	public void update(Observable newBodies, Object arg) {
 		
-		BodyCollector tempBodies = (BodyCollector) newBodies;
 		repaint();
 //		int currentStep = tempBodies.getNumSteps();
 //		
