@@ -129,11 +129,7 @@ public class MassiveBody extends Observable{
 	 *            MassiveBody object
 	 */
 	public void calculateForces(MassiveBody other) {
-//	public void calculateForces(int ID) {
-		// Calculate distance of this from other
-//		double deltaX = calculateDistX(other);
-//		double deltaY = calculateDistY(other);
-//		double distance = calculateDistance(deltaX, deltaY);
+
 		double distance = newCalculateDistance(other);
 		
 //		calculate whether distance < some small number here, and handle accordingly
@@ -267,6 +263,7 @@ public class MassiveBody extends Observable{
 	/// Getters and Setters ///
 	///////////////////////////
 	public void setPosXY(double xPos, double yPos) {
+
 		this.xPos = xPos;
 		this.yPos = yPos;
 		setChanged();
