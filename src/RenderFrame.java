@@ -13,6 +13,7 @@ public class RenderFrame {
 	public static void main(String[] args) {
 		JFrame window = new JFrame("The Window Title");
 		
+
 		if (args.length == 0) {
 			System.out.println("More arguments needed!");
 			System.exit(1);
@@ -40,7 +41,6 @@ public class RenderFrame {
 		Point2D[][] forceMatrix = new Point2D[numWorkers][numBodies];
 		BodyCollector bodies = new BodyCollector(random, numBodies, wallCollisions);
 		
-		
 //		figure out if this is a sequential program or a parallel one
 		if(numWorkers == 1) {
 			
@@ -65,7 +65,9 @@ public class RenderFrame {
 			
 //			initialize correct JPanel
 			RenderingPanelParallel mainPanel = new RenderingPanelParallel(bodies);	
-			bodies.addObserver(mainPanel);
+			for(MassiveBody body : bodies.getListOfBodies()) {
+				body.addObserver(mainPanel);
+			}
 			
 			// Create Barrier
 			CyclicBarrier barrier = new CyclicBarrier(numWorkers);
@@ -108,8 +110,7 @@ public class RenderFrame {
 		    window.setVisible(true);
 			
 //		    wait for the Workers to finish
-		    
-		    for (int i = 0; i < numBodies; i++) {
+		    for (int i = 0; i < numWorkers; i++) {
 		    	try {
 					workers[i].join();
 				} catch (InterruptedException e) {

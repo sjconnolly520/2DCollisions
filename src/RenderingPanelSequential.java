@@ -53,8 +53,6 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 	
 //	used for initialization in constructor
 	Timer timer;
-	
-//	NOTE added by Bree to incorporate choice of timeStep
 	class TimerListener implements ActionListener {
 
 		@Override

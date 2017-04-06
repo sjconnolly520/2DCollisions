@@ -54,7 +54,7 @@ public class Worker extends Thread {
 				e1.printStackTrace();
 			}
 			
-			// Wait for timeblock
+//			// Wait for timeblock
 			try {
 				
 				synchronized (condVar) {
@@ -149,16 +149,6 @@ public class Worker extends Thread {
 				double directionX = second.getxPos() - first.getxPos();
 				double directionY = second.getyPos() - first.getyPos();
 
-				// TODO replace this with the matrix
-				// first.setXForce(first.getXForce() +
-				// gravForceMag*directionX/distance);
-				// second.setXForce(second.getXForce() -
-				// gravForceMag*directionX/distance);
-				// first.setYForce(first.getYForce() +
-				// gravForceMag*directionY/distance);
-				// second.setYForce(second.getYForce() -
-				// gravForceMag*directionY/distance);
-
 				// update force for first body
 				double newXFirst = forceMatrix[ID][i].getX() + gravForceMag * directionX / distance;
 				double newYFirst = forceMatrix[ID][i].getY() + gravForceMag * directionY / distance;
@@ -186,9 +176,7 @@ public class Worker extends Thread {
 		for (int i = startBody; i < endBody; i++) {
 			double forceX = 0.0;
 			double forceY = 0.0;
-			// TODO add up all the force calculations for the current body
-			// TODO pass in numBodies to Worker constructor
-//			for (int j = 0; j < bodies.size(); j++) {
+
 			for (int j = 0; j < numWorkers; j++) {
 				forceX += forceMatrix[j][i].getX();
 				forceY += forceMatrix[j][i].getY();
@@ -208,8 +196,6 @@ public class Worker extends Thread {
 			// set body's position
 			bodies.get(i).setPosXY(bodies.get(i).getxPos() + xDeltaP, bodies.get(i).getyPos() + yDeltaP);
 			
-			// bodies.get(i).setXForce(0.0);
-			// bodies.get(i).setYForce(0.0);
 		}
 	}
 
