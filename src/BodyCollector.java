@@ -4,12 +4,13 @@ import java.util.Observable;
 import java.util.Random;
 import java.util.Scanner;
 
-public class BodyCollector {
+public class BodyCollector extends Observable{
 	
 	private int timeStep;              // time step for this simulation
 	private int numSteps;              // the number of time steps for this simulation
 	private double mass;                  // the mass of each body
 	private double radius;                // the radius of each body
+	private int numWorkers;               // number of workers for this simulation
 	private List<MassiveBody> bodies = new ArrayList<>();
 	int numBodies;
 	Scanner scanner = new Scanner(System.in);
@@ -24,19 +25,25 @@ public class BodyCollector {
 	 * @param randomize		Boolean value describing whether the user wants to generate MassiveBody objects randomly or generate them based on specific values. 
 	 */
 	public BodyCollector(boolean randomize) {
+				
+//		NOTE extra questions added by Bree
+		System.out.print("How many workers do you want?: ");
+		numWorkers = scanner.nextInt();
 		
 		System.out.print("How many bodies would you like to simulate?: ");
 		numBodies = scanner.nextInt();
-		
-//		NOTE extra questions added by Bree
-		System.out.print("What time step do you want (in ms)?: ");
-		timeStep = scanner.nextInt();
 		
 		System.out.print("What is the radius of the bodies (in meters)?: ");
 		radius = scanner.nextFloat();
 		
 		System.out.print("What is the mass of the bodies (in grams)?: ");
 		mass = scanner.nextFloat();
+		
+		System.out.print("What time step do you want (in ms)?: ");
+		timeStep = scanner.nextInt();
+		
+		System.out.print("How many time steps do you want?: ");
+		numSteps = scanner.nextInt();
 		
 		
 		if (randomize) {
@@ -53,7 +60,7 @@ public class BodyCollector {
 	private void getUserBodyData() {
 		
 		for (int i = 0; i < numBodies; i++) {
-			MassiveBody newBody = new MassiveBody(timeStep);
+			MassiveBody newBody = new MassiveBody(timeStep, i);
 			newBody.setName(i);
 			
 			// User prompts
@@ -100,7 +107,7 @@ public class BodyCollector {
 		Random rng = new Random();			// Random number generator
 		
 		for (int i = 0; i < numBodies; i++) {
-			MassiveBody newBody = new MassiveBody(timeStep);
+			MassiveBody newBody = new MassiveBody(timeStep, i);
 			
 			// Generate random value for MassiveBody's mass
 			newBody.setMass(rng.nextDouble() * (maxMass - minMass) + minMass);
@@ -193,6 +200,28 @@ public class BodyCollector {
 	 */
 	public int getTimeStep() {
 		return timeStep;
+	}
+	
+	/**
+	 * @return     Returns the number of time step for this simulation
+	 * @return
+	 */
+	public int getNumSteps() {
+		return numSteps;
+	}
+	
+	public void reduceNumSteps() {
+		numSteps--;
+		setChanged();
+		notifyObservers();
+	}
+	
+	public double getRadius() {
+		return radius;
+	}
+	
+	public double getMass() {
+		return mass;
 	}
 
 }
