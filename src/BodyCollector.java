@@ -4,6 +4,8 @@ import java.util.Observable;
 import java.util.Random;
 import java.util.Scanner;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
+
 public class BodyCollector extends Observable{
 	
 	private int timeStep;              // time step for this simulation
@@ -16,6 +18,7 @@ public class BodyCollector extends Observable{
 	private Scanner scanner = new Scanner(System.in);
 	final double minMass = 50000, maxMass = 500000;
 	final double minRadius = 10, maxRadius = 200;
+	private boolean wallCollisions;
 	final int WIDTH = 620, HEIGHT = 520;
 	
 	/**
@@ -24,14 +27,8 @@ public class BodyCollector extends Observable{
 	 * 
 	 * @param randomize		Boolean value describing whether the user wants to generate MassiveBody objects randomly or generate them based on specific values. 
 	 */
-	public BodyCollector(boolean randomize, int numBodies) {
+	public BodyCollector(boolean randomize, int numBodies, boolean wallCollisions) {
 				
-//		NOTE extra questions added by Bree
-//		System.out.print("How many workers do you want?: ");
-//		numWorkers = scanner.nextInt();
-		
-//		System.out.print("How many bodies would you like to simulate?: ");
-//		numBodies = scanner.nextInt();
 		this.numBodies = numBodies;
 		
 		System.out.print("What is the radius of the bodies (in meters)?: ");
@@ -46,6 +43,7 @@ public class BodyCollector extends Observable{
 		System.out.print("How many time steps do you want?: ");
 		numSteps = scanner.nextInt();
 		
+		this.wallCollisions = wallCollisions;
 		
 		if (randomize) {
 			generateRandomBodies();
@@ -65,12 +63,8 @@ public class BodyCollector extends Observable{
 			newBody.setName(i);
 			
 			// User prompts
-//			System.out.print("What is the radius of body " + (i+1) + " (in meters)?: ");
-//			float radius = scanner.nextFloat();
 			newBody.setRadius(radius);
 			
-//			System.out.print("What is the mass of body " + (i+1) + " (in grams)?: ");
-//			float mass = scanner.nextFloat();
 			newBody.setMass(mass);
 			
 			System.out.print("What is the x location of body " + (i+1) + "?: ");
@@ -223,6 +217,10 @@ public class BodyCollector extends Observable{
 	
 	public double getMass() {
 		return mass;
+	}
+	
+	public boolean wallCollisonsActive() {
+		return wallCollisions;
 	}
 
 }

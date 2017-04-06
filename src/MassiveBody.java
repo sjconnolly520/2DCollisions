@@ -480,4 +480,28 @@ public class MassiveBody extends Observable{
 		return new Color(R, G, B);
 	}
 
+	public void checkForWallCollision(int frameWidth, int frameHeight) {
+		
+		if (xPos < (radius)) {
+			xVel *= -1;
+			xPos = 0.1 + radius;
+		}
+		
+		else if (xPos > (frameWidth - radius)) {
+			xVel *= -1;
+			xPos = frameWidth - radius - 0.1;
+		}
+		
+		if (yPos < (radius)) {
+			yVel *= -1;
+			yPos = 0.1 + radius;
+		}
+		
+		else if (yPos > (frameHeight - radius)) {
+			yVel *= -1;
+			yPos = frameHeight - radius - 0.1;
+		}
+		
+	}
+
 }

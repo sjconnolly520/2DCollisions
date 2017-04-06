@@ -14,6 +14,8 @@ import javax.swing.Timer;
 public class RenderingPanelSequential extends JPanel implements Observer{
 
 	private static final long serialVersionUID = -719329737123739014L;
+	final static int WIDTH = 620;
+	final static int HEIGHT = 520;
 	
 	List<MassiveBody> bodies;
 	MassiveBody b1;
@@ -43,7 +45,6 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 		
 		for (MassiveBody body : this.bodies) {
 			g.setColor(body.getColor());
-//			g.fillOval((int)body.getxPos(), (int)body.getyPos(), (int)body.getRadius(), (int)body.getRadius());
 			g.fillOval((int)body.getXPosForDrawing(), (int)body.getYPosForDrawing(), 2*(int)body.getRadius(), 2*(int)body.getRadius());
 		}
 		
@@ -52,37 +53,6 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 	
 //	used for initialization in constructor
 	Timer timer;
-	
-	// Note: 10ms was the default time step	
-//	Timer timer = new Timer(10, new ActionListener() {
-//		
-//		@Override
-//		public void actionPerformed(ActionEvent e) {
-////			System.out.println("timeStep is " + timeStep);
-////			System.out.println("Timer triggered");
-//			for (int i = 0; i < bodies.size() - 1; i++) {
-//				for (int j = i + 1; j < bodies.size(); j++) {
-////					bodies.get(i).calculateAcceleration(bodies.get(j));
-//					bodies.get(i).calculateForces(bodies.get(j));
-//				}
-//			}
-//			
-//			for (MassiveBody body : bodies) {
-////				body.calculateVelocity();
-////				TODO done separately below
-////				body.calculatePosition();
-//				body.moveBody();
-//			}
-//			
-////			calculate position last
-////			for(MassiveBody body : bodies) {
-////				body.calculatePosition();
-////			}
-//			
-//			repaint();
-//						
-//		}
-//	});
 	
 //	NOTE added by Bree to incorporate choice of timeStep
 	class TimerListener implements ActionListener {
@@ -93,7 +63,6 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 			
 			for (int i = 0; i < bodies.size() - 1; i++) {
 				for (int j = i + 1; j < bodies.size(); j++) {
-//					bodies.get(i).calculateAcceleration(bodies.get(j));
 					bodies.get(i).calculateForces(bodies.get(j));
 				}
 			}
@@ -105,10 +74,11 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 				body.moveBody();
 			}
 			
-//				calculate position last
-//				for(MassiveBody body : bodies) {
-//					body.calculatePosition();
-//				}
+			if (initializedBodies.wallCollisonsActive()) {
+				for (MassiveBody body : bodies) {
+					body.checkForWallCollision(WIDTH, HEIGHT);
+				}
+			}
 			
 			repaint();
 			

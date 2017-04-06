@@ -12,22 +12,34 @@ public class RenderFrame {
 	
 	public static void main(String[] args) {
 		JFrame window = new JFrame("The Window Title");
-		int numWorkers = Integer.parseInt(args[0]);
-		Worker[] workers = new Worker[numWorkers];
-		int numBodies = Integer.parseInt(args[1]);
-		Point2D[][] forceMatrix = new Point2D[numWorkers][numBodies];
-		
-		boolean random = false;
-		if ( args.length > 4 && args[0].equals( "-r" ) ) {
-			random = true;
-		}
-		
-		BodyCollector bodies = new BodyCollector(random, numBodies);
 		
 		if (args.length == 0) {
 			System.out.println("More arguments needed!");
 			System.exit(1);
 		}
+
+		boolean random = false;
+		boolean wallCollisions = false;
+		if ( args.length > 4 ) {
+			for (int i = 0; i < args.length; i++) {
+				if (args[i].equals("-r")) {
+					random = true;
+				}
+				
+				if (args[i].equals("-wc")) {
+					wallCollisions = true;
+				}
+			}
+		}
+		
+		wallCollisions = true; //FIXME: Delete me. I'm here for testing.
+		
+		int numWorkers = Integer.parseInt(args[0]);
+		Worker[] workers = new Worker[numWorkers];
+		int numBodies = Integer.parseInt(args[1]);
+		Point2D[][] forceMatrix = new Point2D[numWorkers][numBodies];
+		BodyCollector bodies = new BodyCollector(random, numBodies, wallCollisions);
+		
 		
 //		figure out if this is a sequential program or a parallel one
 		if(numWorkers == 1) {
