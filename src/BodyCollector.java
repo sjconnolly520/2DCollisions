@@ -222,5 +222,14 @@ public class BodyCollector extends Observable{
 	public boolean wallCollisonsActive() {
 		return wallCollisions;
 	}
+	
+	public int getTotalCollisions() {
+		int totalCollisions = 0;
+		for (MassiveBody body : bodies) {
+			totalCollisions += body.getCollisions();
+		}
+		
+		return totalCollisions;
+	}
 
 }

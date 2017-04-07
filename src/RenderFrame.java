@@ -11,8 +11,7 @@ public class RenderFrame {
 	static int timeStep;
 	
 	public static void main(String[] args) {
-		JFrame window = new JFrame("The Window Title");
-		
+		JFrame window = new JFrame("The Window Title");		
 
 		if (args.length == 0) {
 			System.out.println("More arguments needed!");
@@ -38,22 +37,24 @@ public class RenderFrame {
 		int numWorkers = Integer.parseInt(args[0]);
 		Worker[] workers = new Worker[numWorkers];
 		int numBodies = Integer.parseInt(args[1]);
-		Point2D[][] forceMatrix = new Point2D[numWorkers][numBodies];
 		BodyCollector bodies = new BodyCollector(random, numBodies, wallCollisions);
 		
 //		figure out if this is a sequential program or a parallel one
 		if(numWorkers == 1) {
 			
 //			set up the sequential panel
-			RenderingPanelSequential mainPanel = new RenderingPanelSequential(bodies);	
+			RenderingPanelSequential mainPanel = new RenderingPanelSequential(bodies);
+			
 			bodies.addObserver(mainPanel);
 			window.setContentPane(mainPanel);
 		    window.setSize(WIDTH,HEIGHT);
 		    window.setLocation(100, 100);
 		    window.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		    window.setVisible(true);
+		    		
 		} else {
 //			initialize force matrix, parallel JPanel, and start workers
+			Point2D[][] forceMatrix = new Point2D[numWorkers][numBodies];
 			
 			
 //			initialize the force matrix to 0.0 in every cell
@@ -103,6 +104,7 @@ public class RenderFrame {
 				workers[i].start();
 			}			
 			
+//			TODO decide if this should go before starting the workers
 //			initialize the correct panel
 		    window.setSize(WIDTH,HEIGHT);
 		    window.setLocation(100, 100);
@@ -121,6 +123,16 @@ public class RenderFrame {
 		    
 		    // Timer stop
 		    long endTime = System.nanoTime();
+		    
+//		    calculate computation time
+		    long seconds = (long) ((endTime-startTime) * .0000000001);
+		    long milliseconds = (long) (((endTime-startTime) % 1000000000) * .0000001);
+		    
+//		    print out computation time
+		    System.out.println("computation time: " + seconds + " seconds " + milliseconds + " milliseconds");
+		    
+//		    print out number of collisions
+		    System.out.println("number of collisions: " + bodies.getTotalCollisions());
 		}
 	    
 	}

@@ -20,6 +20,7 @@ public class MassiveBody extends Observable {
 	private boolean stationary = false; // stationary body is centered during
 										// simulation; Likely just for testing
 	private boolean wallCollisions;
+	private int numCollisions;
 
 	// NOTE added by Bree
 	private double xForce = 0, yForce = 0; // initial forces
@@ -34,6 +35,7 @@ public class MassiveBody extends Observable {
 		this.timeStep = timeStep;
 		this.name = name;
 		this.wallCollisions = wallCollisions;
+		this.numCollisions = 0;
 	}
 
 	/**
@@ -142,6 +144,7 @@ public class MassiveBody extends Observable {
 		// TODO figure out what this small number should be
 		if (distance <= (2 * radius)) {
 			System.out.println("collision detected");
+			this.numCollisions++;
 			// TODO back up a time step?
 			// recalculate velocities using collision equations
 
@@ -511,6 +514,14 @@ public class MassiveBody extends Observable {
 			yPos = HEIGHT - radius - 0.1 - 25;
 		}
 
+	}
+
+	public int getCollisions() {
+		return numCollisions;
+	}
+	
+	public void incrementCollisions() {
+		numCollisions++;
 	}
 
 }

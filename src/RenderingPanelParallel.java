@@ -16,11 +16,13 @@ public class RenderingPanelParallel extends JPanel implements Observer{
 	int timeStep;
 	int numSteps;
 	BodyCollector initializedBodies;
+	int totalCollisions;
 	
 	
 	public RenderingPanelParallel(BodyCollector bodies) {
 		setBackground(Color.WHITE);
-		this.bodies = bodies.getListOfBodies();		
+		this.bodies = bodies.getListOfBodies();	
+		totalCollisions = 0;
 	}
 	
 	@Override
@@ -36,8 +38,11 @@ public class RenderingPanelParallel extends JPanel implements Observer{
 
 	@Override
 	public void update(Observable newBodies, Object arg) {
+
+//		just repaint the JPanel
 		repaint();
 	}
+	
 }
 
 

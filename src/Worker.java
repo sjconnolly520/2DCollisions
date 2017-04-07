@@ -71,7 +71,6 @@ public class Worker extends Thread {
 	public void calculateForces() {
 
 		for (int i = startBody; i < endBody; i++) {
-			// TODO figure out if this loop should go from i..n
 			for (int j = i + 1; j < bodies.size(); j++) {
 				// Calculate distance of i from j
 				MassiveBody first = bodies.get(i);
@@ -83,14 +82,14 @@ public class Worker extends Thread {
 				// TODO figure out what this small number should be
 				if (distance <= (2 * collector.getRadius())) {
 					System.out.println("collision detected");
+					first.incrementCollisions();
 					// TODO back up a time step?
 					// recalculate velocities using collision equations
 
 					// what is the distance? is it < 2r? if so, reset positions
 					// as if they were 2r apart
-
-					// compute x- and y-velocities for this body after collision
-					// NOTE Bree has no idea how to make this look nicer
+					
+//					set up local vars
 					double firstXVel = first.getxVel();
 					double secondXVel = second.getxVel();
 					double firstYVel = first.getyVel();
@@ -102,6 +101,7 @@ public class Worker extends Thread {
 					double divisor = (((secondXPos - firstXPos) * (secondXPos - firstXPos))
 							+ ((secondYPos - firstYPos) * (secondYPos - firstYPos)));
 
+					// compute x- and y-velocities for first body after collision
 					double v1fx = (((secondXVel * (secondXPos - firstXPos) * (secondXPos - firstXPos))
 							+ (secondYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos)))
 							+ ((firstXVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))
