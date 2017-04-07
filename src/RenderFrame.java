@@ -95,12 +95,13 @@ public class RenderFrame {
 			}
 						
 			
-			// Timer start TODO:
+			// Timer start
+			long startTime = System.nanoTime();
+			
 			// Start each worker
 			for (int i = 0; i < workers.length; i++) {
 				workers[i].start();
-			}
-			
+			}			
 			
 //			initialize the correct panel
 		    window.setSize(WIDTH,HEIGHT);
@@ -118,7 +119,8 @@ public class RenderFrame {
 				}
 		    }
 		    
-		    // TODO: Timer stop;
+		    // Timer stop
+		    long endTime = System.nanoTime();
 		}
 	    
 	}

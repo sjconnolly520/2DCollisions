@@ -149,39 +149,42 @@ public class MassiveBody extends Observable {
 			// they were 2r apart
 
 			// compute x- and y-velocities for this body after collision
-			// NOTE Bree has no idea how to make this look nicer
-			double v1fx = (((other.getxVel() * (other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos()))
-					+ (other.getyVel() * (other.getxPos() - this.getxPos()) * (other.getyPos() - this.getyPos())))
-					+ ((this.getxVel() * (other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos()))
-							- (this.getyVel() * (other.getxPos() - this.getxPos())
-									* (other.getyPos() - this.getyPos()))))
-					/ (((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos()))
-							+ ((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
+			double firstXVel = this.getxVel();
+			double secondXVel = other.getxVel();
+			double firstYVel = this.getyVel();
+			double secondYVel = other.getyVel();
+			double firstXPos = this.getxPos();
+			double secondXPos = other.getxPos();
+			double firstYPos = this.getyPos();
+			double secondYPos = other.getyPos();
+			double divisor = (((secondXPos - firstXPos) * (secondXPos - firstXPos))
+					+ ((secondYPos - firstYPos) * (secondYPos - firstYPos)));
 
-			double v1fy = (((other.getxVel() * ((other.getxPos() - this.getxPos()) * (other.getyPos() - this.getyPos()))
-					+ (other.getyVel() * (other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos()))))
-					- ((this.getxVel() * (other.getyPos() - this.getyPos()) * (other.getxPos() - this.getxPos()))
-							+ (this.getyVel() * (other.getxPos() - this.getxPos())
-									* (other.getxPos() - this.getxPos()))))
-					/ (((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos()))
-							+ ((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
+			double v1fx = (((secondXVel * (secondXPos - firstXPos) * (secondXPos - firstXPos))
+					+ (secondYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos)))
+					+ ((firstXVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))
+							- (firstYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos))))
+					/ divisor;
 
-			// compute x- and y-velocities for other body after collision
-			double v2fx = (((this.getxVel() * ((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos()))
-					+ (this.getyVel() * (other.getxPos() - this.getxPos()) * (other.getyPos() - this.getyPos()))))
-					+ ((other.getxVel() * (other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos()))
-							- (other.getyVel() * (other.getxPos() - this.getxPos())
-									* (other.getyPos() - this.getyPos()))))
-					/ (((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos()))
-							+ ((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
+			double v1fy = (((secondXVel * ((secondXPos - firstXPos) * (secondYPos - firstYPos))
+					+ (secondYVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))))
+					- ((firstXVel * (secondYPos - firstYPos) * (secondXPos - firstXPos))
+							+ (firstYVel * (secondXPos - firstXPos) * (secondXPos - firstXPos))))
+					/ divisor;
 
-			double v2fy = (((this.getxVel() * ((other.getxPos() - this.getxPos()) * (other.getyPos() - this.getyPos()))
-					+ (this.getyVel() * (other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos()))))
-					- ((other.getxVel() * (other.getyPos() - this.getyPos()) * (other.getxPos() - this.getxPos()))
-							+ (other.getyVel() * (other.getxPos() - this.getxPos())
-									* (other.getxPos() - this.getxPos()))))
-					/ (((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos()))
-							+ ((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
+			// compute x- and y-velocities for second body after
+			// collision
+			double v2fx = (((firstXVel * ((secondXPos - firstXPos) * (secondXPos - firstXPos))
+					+ (firstYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos))))
+					+ ((secondXVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))
+							- (secondYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos))))
+					/ divisor;
+
+			double v2fy = (((firstXVel * ((secondXPos - firstXPos) * (secondYPos - firstYPos))
+					+ (firstYVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))))
+					- ((secondXVel * (secondYPos - firstYPos) * (secondXPos - firstXPos))
+							+ (secondYVel * (secondXPos - firstXPos) * (secondXPos - firstXPos))))
+					/ divisor;
 
 			// update velocities
 			this.setxVel(v1fx);
