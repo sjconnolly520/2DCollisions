@@ -4,10 +4,6 @@ import java.util.Observable;
 import java.util.Random;
 import java.util.Scanner;
 
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
-
-import com.sun.xml.internal.ws.wsdl.parser.InaccessibleWSDLException;
-
 public class BodyCollector extends Observable{
 	
 	private int timeStep;              // time step for this simulation

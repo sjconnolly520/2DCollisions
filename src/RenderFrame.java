@@ -1,5 +1,4 @@
 import java.awt.geom.Point2D;
-import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 
 import javax.swing.JFrame;
@@ -11,8 +10,8 @@ public class RenderFrame {
 	static int timeStep;
 	
 	public static void main(String[] args) {
-		JFrame window = new JFrame("The Window Title");
-		
+		JFrame window = new JFrame("2-D Collisons on N-Bodies");
+
 		// If not enough arguments are given
 		if (args.length < 4) {
 			System.out.println("Function must be called using the following syntax:");
@@ -57,8 +56,8 @@ public class RenderFrame {
 			window.setContentPane(mainPanel);
 		    window.setSize(WIDTH,HEIGHT);
 		    window.setLocation(100, 100);
-		    window.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		    window.setAlwaysOnTop(true);
+		    window.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		    window.setVisible(true);
 		} else {
 //			initialize force matrix, parallel JPanel, and start workers
@@ -103,13 +102,12 @@ public class RenderFrame {
 			}
 						
 			
-			// Timer start
-			long startTime = System.nanoTime();
-			
+			// Timer start TODO:
 			// Start each worker
 			for (int i = 0; i < workers.length; i++) {
 				workers[i].start();
-			}			
+			}
+			
 			
 //			initialize the correct panel
 		    window.setSize(WIDTH,HEIGHT);
@@ -128,8 +126,7 @@ public class RenderFrame {
 				}
 		    }
 		    
-		    // Timer stop
-		    long endTime = System.nanoTime();
+		    // TODO: Timer stop;
 		}
 	    
 	}
