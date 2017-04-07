@@ -19,7 +19,8 @@ public class Worker extends Thread {
 																// Gravitational
 																// Constant
 
-	public Worker(int ID, BodyCollector bodies, Point2D[][] forces, int startBody, int endBody, CyclicBarrier barrier, int numWorkers) {
+	public Worker(int ID, BodyCollector bodies, Point2D[][] forces, int startBody, int endBody, CyclicBarrier barrier,
+			int numWorkers) {
 		this.ID = ID;
 		this.condVar = new Object();
 		this.collector = bodies;
@@ -37,7 +38,7 @@ public class Worker extends Thread {
 	public void run() {
 		for (int i = 0; i < numSteps; i++) {
 			calculateForces();
-			
+
 			// Wait for all threads to reconcile
 			try {
 				barrier.await();
@@ -46,21 +47,21 @@ public class Worker extends Thread {
 			}
 
 			moveBodies();
-			
+
 			// Wait for all threads to reconcile
 			try {
 				barrier.await();
 			} catch (InterruptedException | BrokenBarrierException e1) {
 				e1.printStackTrace();
 			}
-			
-//			// Wait for timeblock
+
+			// // Wait for timeblock
 			try {
-				
+
 				synchronized (condVar) {
 					condVar.wait(timeStep);
 				}
-//				condVar.wait(timeStep);
+				// condVar.wait(timeStep);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -70,7 +71,6 @@ public class Worker extends Thread {
 	public void calculateForces() {
 
 		for (int i = startBody; i < endBody; i++) {
-			// TODO figure out if this loop should go from i..n
 			for (int j = i + 1; j < bodies.size(); j++) {
 				// Calculate distance of i from j
 				MassiveBody first = bodies.get(i);
@@ -82,59 +82,51 @@ public class Worker extends Thread {
 				// TODO figure out what this small number should be
 				if (distance <= (2 * collector.getRadius())) {
 					System.out.println("collision detected");
+					first.incrementCollisions();
 					// TODO back up a time step?
 					// recalculate velocities using collision equations
 
 					// what is the distance? is it < 2r? if so, reset positions
 					// as if they were 2r apart
+					
+//					set up local vars
+					double firstXVel = first.getxVel();
+					double secondXVel = second.getxVel();
+					double firstYVel = first.getyVel();
+					double secondYVel = second.getyVel();
+					double firstXPos = first.getxPos();
+					double secondXPos = second.getxPos();
+					double firstYPos = first.getyPos();
+					double secondYPos = second.getyPos();
+					double divisor = (((secondXPos - firstXPos) * (secondXPos - firstXPos))
+							+ ((secondYPos - firstYPos) * (secondYPos - firstYPos)));
 
-					// compute x- and y-velocities for this body after collision
-					// NOTE Bree has no idea how to make this look nicer
-					double v1fx = (((second.getxVel() * (second.getxPos() - first.getxPos())
-							* (second.getxPos() - first.getxPos()))
-							+ (second.getyVel() * (second.getxPos() - first.getxPos())
-									* (second.getyPos() - first.getyPos())))
-							+ ((first.getxVel() * (second.getyPos() - first.getyPos())
-									* (second.getyPos() - first.getyPos()))
-									- (first.getyVel() * (second.getxPos() - first.getxPos())
-											* (second.getyPos() - first.getyPos()))))
-							/ (((second.getxPos() - first.getxPos()) * (second.getxPos() - first.getxPos()))
-									+ ((second.getyPos() - first.getyPos()) * (second.getyPos() - first.getyPos())));
+					// compute x- and y-velocities for first body after collision
+					double v1fx = (((secondXVel * (secondXPos - firstXPos) * (secondXPos - firstXPos))
+							+ (secondYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos)))
+							+ ((firstXVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))
+									- (firstYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos))))
+							/ divisor;
 
-					double v1fy = (((second.getxVel()
-							* ((second.getxPos() - first.getxPos()) * (second.getyPos() - first.getyPos()))
-							+ (second.getyVel() * (second.getyPos() - first.getyPos())
-									* (second.getyPos() - first.getyPos()))))
-							- ((first.getxVel() * (second.getyPos() - first.getyPos())
-									* (second.getxPos() - first.getxPos()))
-									+ (first.getyVel() * (second.getxPos() - first.getxPos())
-											* (second.getxPos() - first.getxPos()))))
-							/ (((second.getxPos() - first.getxPos()) * (second.getxPos() - first.getxPos()))
-									+ ((second.getyPos() - first.getyPos()) * (second.getyPos() - first.getyPos())));
+					double v1fy = (((secondXVel * ((secondXPos - firstXPos) * (secondYPos - firstYPos))
+							+ (secondYVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))))
+							- ((firstXVel * (secondYPos - firstYPos) * (secondXPos - firstXPos))
+									+ (firstYVel * (secondXPos - firstXPos) * (secondXPos - firstXPos))))
+							/ divisor;
 
 					// compute x- and y-velocities for second body after
 					// collision
-					double v2fx = (((first.getxVel()
-							* ((second.getxPos() - first.getxPos()) * (second.getxPos() - first.getxPos()))
-							+ (first.getyVel() * (second.getxPos() - first.getxPos())
-									* (second.getyPos() - first.getyPos()))))
-							+ ((second.getxVel() * (second.getyPos() - first.getyPos())
-									* (second.getyPos() - first.getyPos()))
-									- (second.getyVel() * (second.getxPos() - first.getxPos())
-											* (second.getyPos() - first.getyPos()))))
-							/ (((second.getxPos() - first.getxPos()) * (second.getxPos() - first.getxPos()))
-									+ ((second.getyPos() - first.getyPos()) * (second.getyPos() - first.getyPos())));
+					double v2fx = (((firstXVel * ((secondXPos - firstXPos) * (secondXPos - firstXPos))
+							+ (firstYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos))))
+							+ ((secondXVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))
+									- (secondYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos))))
+							/ divisor;
 
-					double v2fy = (((first.getxVel()
-							* ((second.getxPos() - first.getxPos()) * (second.getyPos() - first.getyPos()))
-							+ (first.getyVel() * (second.getyPos() - first.getyPos())
-									* (second.getyPos() - first.getyPos()))))
-							- ((second.getxVel() * (second.getyPos() - first.getyPos())
-									* (second.getxPos() - first.getxPos()))
-									+ (second.getyVel() * (second.getxPos() - first.getxPos())
-											* (second.getxPos() - first.getxPos()))))
-							/ (((second.getxPos() - first.getxPos()) * (second.getxPos() - first.getxPos()))
-									+ ((second.getyPos() - first.getyPos()) * (second.getyPos() - first.getyPos())));
+					double v2fy = (((firstXVel * ((secondXPos - firstXPos) * (secondYPos - firstYPos))
+							+ (firstYVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))))
+							- ((secondXVel * (secondYPos - firstYPos) * (secondXPos - firstXPos))
+									+ (secondYVel * (secondXPos - firstXPos) * (secondXPos - firstXPos))))
+							/ divisor;
 
 					// update velocities
 					first.setxVel(v1fx);
@@ -155,8 +147,8 @@ public class Worker extends Thread {
 				forceMatrix[ID][i].setLocation(newXFirst, newYFirst);
 
 				// update force for second body
-				double newXSecond = forceMatrix[ID][j].getX() + gravForceMag * directionX / distance;
-				double newYSecond = forceMatrix[ID][j].getY() + gravForceMag * directionY / distance;
+				double newXSecond = forceMatrix[ID][j].getX() - gravForceMag * directionX / distance;
+				double newYSecond = forceMatrix[ID][j].getY() - gravForceMag * directionY / distance;
 				forceMatrix[ID][j].setLocation(newXSecond, newYSecond);
 
 			}
@@ -186,8 +178,8 @@ public class Worker extends Thread {
 			// multiplied by 1000 to scale, otherwise it doesn't move very fast
 			double xDeltaV = (forceX / bodies.get(i).getMass()) * timeStep * 1000;
 			double yDeltaV = (forceY / bodies.get(i).getMass()) * timeStep * 1000;
-			double xDeltaP = ((bodies.get(i).getxVel() + (xDeltaV / 2))) * timeStep * 1000;
-			double yDeltaP = ((bodies.get(i).getyVel() + (yDeltaV / 2))) * timeStep * 1000;
+			double xDeltaP = ((bodies.get(i).getxVel() + (xDeltaV * .5))) * timeStep * 1000;
+			double yDeltaP = ((bodies.get(i).getyVel() + (yDeltaV * .5))) * timeStep * 1000;
 
 			// set body's velocity
 			bodies.get(i).setxVel(bodies.get(i).getxVel() + xDeltaV);
@@ -195,7 +187,7 @@ public class Worker extends Thread {
 
 			// set body's position
 			bodies.get(i).setPosXY(bodies.get(i).getxPos() + xDeltaP, bodies.get(i).getyPos() + yDeltaP);
-			
+
 		}
 	}
 

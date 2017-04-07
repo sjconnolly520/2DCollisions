@@ -14,12 +14,15 @@ import javax.swing.Timer;
 public class RenderingPanelSequential extends JPanel implements Observer{
 
 	private static final long serialVersionUID = -719329737123739014L;
+	final static int WIDTH = 620;
+	final static int HEIGHT = 520;
 	
 	List<MassiveBody> bodies;
 	MassiveBody b1;
 	MassiveBody b2;
 	int timeStep;
 	int numSteps;
+	long startTime;
 	BodyCollector initializedBodies;
 	
 	
@@ -30,6 +33,8 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 		this.timeStep = bodies.getTimeStep();
 		this.numSteps = bodies.getNumSteps();
 		
+//		start the timer for sequential version
+		startTime = System.nanoTime();
 		
 //		had to use this initialization to have customized time steps
 		timer = new Timer(timeStep, new TimerListener());
@@ -51,6 +56,7 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 	
 //	used for initialization in constructor
 	Timer timer;
+
 	class TimerListener implements ActionListener {
 
 		@Override
@@ -70,10 +76,11 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 				body.moveBody();
 			}
 			
-//				calculate position last
-//				for(MassiveBody body : bodies) {
-//					body.calculatePosition();
-//				}
+			if (initializedBodies.wallCollisonsActive()) {
+				for (MassiveBody body : bodies) {
+					body.checkForWallCollision();
+				}
+			}
 			
 			repaint();
 			
@@ -93,6 +100,14 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 		if(currentStep <= 0) {
 			System.out.println("stopping simulation");
 			timer.stop();
+			
+//			print out computation time and number of collisions
+		    long endTime = System.nanoTime();
+		    long seconds = (long) ((endTime-startTime) * .0000000001);
+		    long milliseconds = (long) (((endTime-startTime) % 1000000000) * .0000001);
+		    System.out.println("computation time: " + seconds + " seconds " + milliseconds + " milliseconds");
+		    System.out.println("number of collisions: " + tempBodies.getTotalCollisions());
+		    
 		}
 		
 	}

@@ -3,31 +3,39 @@ import java.awt.Point;
 import java.util.Observable;
 
 // Created 3/24/2017
-public class MassiveBody extends Observable{
-	
-	private double xPos, yPos;             // position
-	private double radius;                 // dimensions for drawing
-	private double xVel = 0, yVel = 0;     // velocities along x, y axes
-	private double xAcc = 0, yAcc = 0;     // accelerations along x, y axes
-	private double mass = 1;               // default = 1
+public class MassiveBody extends Observable {
+
+	final static int WIDTH = 620;
+	final static int HEIGHT = 520;
+
+	private double xPos, yPos; // position
+	private double radius; // dimensions for drawing
+	private double xVel = 0, yVel = 0; // velocities along x, y axes
+	private double xAcc = 0, yAcc = 0; // accelerations along x, y axes
+	private double mass = 1; // default = 1
 	private static final double G = 6.67 * Math.pow(10, -11); // Universal
 																// Gravitational
 																// Constant
 	private Color color;
-	private boolean stationary = false;    // stationary body is centered during
-										   // simulation; Likely just for testing
-	
-//	NOTE added by Bree
-	private double xForce = 0, yForce = 0; // initial forces
-	private int name;                      // TODO for identifying a body
-	private int timeStep;                  // the specified timeStep
+	private boolean stationary = false; // stationary body is centered during
+										// simulation; Likely just for testing
+	private boolean wallCollisions;
+	private int numCollisions;
 
-//	NOTE Bree added the timeStep to the constructor so it could do the proper calculations
-//	in the added functions
-	public MassiveBody(int timeStep, int name) {
+	// NOTE added by Bree
+	private double xForce = 0, yForce = 0; // initial forces
+	private int name; // TODO for identifying a body
+	private int timeStep; // the specified timeStep
+
+	// NOTE Bree added the timeStep to the constructor so it could do the proper
+	// calculations
+	// in the added functions
+	public MassiveBody(int timeStep, int name, boolean wallCollisions) {
 		color = generateRandomColor();
 		this.timeStep = timeStep;
 		this.name = name;
+		this.wallCollisions = wallCollisions;
+		this.numCollisions = 0;
 	}
 
 	/**
@@ -70,9 +78,10 @@ public class MassiveBody extends Observable{
 	public double calculateDistance(double dist_x, double dist_y) {
 		return Math.sqrt((dist_x * dist_x) + (dist_y * dist_y));
 	}
-	
+
 	public double newCalculateDistance(MassiveBody other) {
-		return Math.sqrt(((this.getxPos() - other.getxPos()) * (this.getxPos() - other.getxPos())) + ((this.getyPos() - other.getyPos()) * (this.getyPos() - other.getyPos())));
+		return Math.sqrt(((this.getxPos() - other.getxPos()) * (this.getxPos() - other.getxPos()))
+				+ ((this.getyPos() - other.getyPos()) * (this.getyPos() - other.getyPos())));
 	}
 
 	/**
@@ -90,17 +99,15 @@ public class MassiveBody extends Observable{
 		double deltaX = calculateDistX(other);
 		double deltaY = calculateDistY(other);
 		double distance = calculateDistance(deltaX, deltaY);
-		
 
 		// Calculate axial forces on objects due to gravity
 		double gravForceMag = (G * mass * other.getMass()) / (distance * distance);
 		double forceX = Math.abs(gravForceMag * (deltaX / distance));
-		double forceY = Math.abs(gravForceMag * (deltaY / distance));		
+		double forceY = Math.abs(gravForceMag * (deltaY / distance));
 
 		// Calculate axial accelerations due to gravity and add to current axial
 		// accelerations
 		// FIXME: Stephen feels certain that this can be made more efficient.
-		// Also, THIS DOESNT WORK!!!
 		if (this.getxPos() < other.getxPos()) {
 			this.addToXAcc(forceX / this.getMass());
 			other.addToXAcc(-forceX / other.getMass());
@@ -118,11 +125,11 @@ public class MassiveBody extends Observable{
 		}
 
 	}
-	
+
 	/**
 	 * 
-	 * Calculates the forces affecting MassiveBody objects due to the presence of
-	 * other MassiveBody objects. ADDED BY BREE TO MIRROR THE BOOK EXAMPLE
+	 * Calculates the forces affecting MassiveBody objects due to the presence
+	 * of other MassiveBody objects. ADDED BY BREE TO MIRROR THE BOOK EXAMPLE
 	 * 
 	 * @param other
 	 *            The MassiveBody object which is exerting influence on this
@@ -131,68 +138,74 @@ public class MassiveBody extends Observable{
 	public void calculateForces(MassiveBody other) {
 
 		double distance = newCalculateDistance(other);
-		
-//		calculate whether distance < some small number here, and handle accordingly
-//		TODO figure out what this small number should be
-		if(distance <= (2*radius)){
-			System.out.println("collision detected");
-//			TODO back up a time step?
-//			recalculate velocities using collision equations
-			
-//			what is the distance? is it < 2r? if so, reset positions as if they were 2r apart
-			
-//			compute x- and y-velocities for this body after collision
-//			NOTE Bree has no idea how to make this look nicer
-			double v1fx = (((other.getxVel() * (other.getxPos() - this.getxPos()) * (other.getxPos() - 
-					this.getxPos())) + (other.getyVel() * (other.getxPos() - this.getxPos()) *
-					(other.getyPos() - this.getyPos()))) + ((this.getxVel() * (other.getyPos() -
-					this.getyPos()) * (other.getyPos() - this.getyPos())) - (this.getyVel() *
-					(other.getxPos() - this.getxPos()) * (other.getyPos() - this.getyPos())))) / 
-					(((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())) +
-					((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
-			
-			double v1fy = (((other.getxVel() * ((other.getxPos() - this.getxPos()) * (other.getyPos() - 
-					this.getyPos())) + (other.getyVel() * (other.getyPos() - this.getyPos()) * 
-					(other.getyPos() - this.getyPos())))) - ((this.getxVel() * (other.getyPos() -
-					this.getyPos()) * (other.getxPos() - this.getxPos())) + (this.getyVel() *
-					(other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())))) / 
-					(((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())) +
-					((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
-			
-//			compute x- and y-velocities for other body after collision
-			double v2fx = (((this.getxVel() * ((other.getxPos() - this.getxPos()) * (other.getxPos() - 
-					this.getxPos())) + (this.getyVel() * (other.getxPos() - this.getxPos()) * 
-					(other.getyPos() - this.getyPos())))) + ((other.getxVel() * (other.getyPos() -
-					this.getyPos()) * (other.getyPos() - this.getyPos())) - (other.getyVel() *
-					(other.getxPos() - this.getxPos()) * (other.getyPos() - this.getyPos())))) / 
-					(((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())) +
-					((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
 
-			double v2fy = (((this.getxVel() * ((other.getxPos() - this.getxPos()) * (other.getyPos() - 
-					this.getyPos())) + (this.getyVel() * (other.getyPos() - this.getyPos()) * 
-					(other.getyPos() - this.getyPos())))) - ((other.getxVel() * (other.getyPos() -
-					this.getyPos()) * (other.getxPos() - this.getxPos())) + (other.getyVel() *
-					(other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())))) / 
-					(((other.getxPos() - this.getxPos()) * (other.getxPos() - this.getxPos())) +
-					((other.getyPos() - this.getyPos()) * (other.getyPos() - this.getyPos())));
-			
-//			update velocities
+		// calculate whether distance < some small number here, and handle
+		// accordingly
+		// TODO figure out what this small number should be
+		if (distance <= (2 * radius)) {
+			System.out.println("collision detected");
+			this.numCollisions++;
+			// TODO back up a time step?
+			// recalculate velocities using collision equations
+
+			// what is the distance? is it < 2r? if so, reset positions as if
+			// they were 2r apart
+
+			// compute x- and y-velocities for this body after collision
+			double firstXVel = this.getxVel();
+			double secondXVel = other.getxVel();
+			double firstYVel = this.getyVel();
+			double secondYVel = other.getyVel();
+			double firstXPos = this.getxPos();
+			double secondXPos = other.getxPos();
+			double firstYPos = this.getyPos();
+			double secondYPos = other.getyPos();
+			double divisor = (((secondXPos - firstXPos) * (secondXPos - firstXPos))
+					+ ((secondYPos - firstYPos) * (secondYPos - firstYPos)));
+
+			double v1fx = (((secondXVel * (secondXPos - firstXPos) * (secondXPos - firstXPos))
+					+ (secondYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos)))
+					+ ((firstXVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))
+							- (firstYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos))))
+					/ divisor;
+
+			double v1fy = (((secondXVel * ((secondXPos - firstXPos) * (secondYPos - firstYPos))
+					+ (secondYVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))))
+					- ((firstXVel * (secondYPos - firstYPos) * (secondXPos - firstXPos))
+							+ (firstYVel * (secondXPos - firstXPos) * (secondXPos - firstXPos))))
+					/ divisor;
+
+			// compute x- and y-velocities for second body after
+			// collision
+			double v2fx = (((firstXVel * ((secondXPos - firstXPos) * (secondXPos - firstXPos))
+					+ (firstYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos))))
+					+ ((secondXVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))
+							- (secondYVel * (secondXPos - firstXPos) * (secondYPos - firstYPos))))
+					/ divisor;
+
+			double v2fy = (((firstXVel * ((secondXPos - firstXPos) * (secondYPos - firstYPos))
+					+ (firstYVel * (secondYPos - firstYPos) * (secondYPos - firstYPos))))
+					- ((secondXVel * (secondYPos - firstYPos) * (secondXPos - firstXPos))
+							+ (secondYVel * (secondXPos - firstXPos) * (secondXPos - firstXPos))))
+					/ divisor;
+
+			// update velocities
 			this.setxVel(v1fx);
 			this.setyVel(v1fy);
 			other.setxVel(v2fx);
 			other.setyVel(v2fy);
 		}
-				
+
 		// Calculate axial forces on objects due to gravity
 		double gravForceMag = (G * mass * other.getMass()) / (distance * distance);
-		
-		double directionX = other.getxPos() - this.getxPos(); 
+
+		double directionX = other.getxPos() - this.getxPos();
 		double directionY = other.getyPos() - this.getyPos();
-		
-		this.setXForce(this.getXForce() + gravForceMag*directionX/distance);
-		other.setXForce(other.getXForce() - gravForceMag*directionX/distance);
-		this.setYForce(this.getYForce() + gravForceMag*directionY/distance);
-		other.setYForce(other.getYForce() - gravForceMag*directionY/distance);
+
+		this.setXForce(this.getXForce() + gravForceMag * directionX / distance);
+		other.setXForce(other.getXForce() - gravForceMag * directionX / distance);
+		this.setYForce(this.getYForce() + gravForceMag * directionY / distance);
+		other.setYForce(other.getYForce() - gravForceMag * directionY / distance);
 
 	}
 
@@ -204,7 +217,7 @@ public class MassiveBody extends Observable{
 	 * 
 	 */
 	public void calculateVelocity() {
-		
+
 		setxVel(getxVel() + getxAcc() * 1000000); // Times 1000000 for rendering
 													// purposes
 		setyVel(getyVel() + getyAcc() * 1000000);
@@ -224,29 +237,29 @@ public class MassiveBody extends Observable{
 		setxPos(getxPos() + getxVel());
 		setyPos(getyPos() + getyVel());
 	}
-	
+
 	/**
 	 * 
-	 * Updates the velocities and axial positions of this MassiveBody object based on 
-	 * the forces affecting the object. ADDED BY BREE TO REFLECT THE BOOK EXAMPLE
+	 * Updates the velocities and axial positions of this MassiveBody object
+	 * based on the forces affecting the object. ADDED BY BREE TO REFLECT THE
+	 * BOOK EXAMPLE
 	 * 
 	 */
 	public void moveBody() {
-//		multiplied by 1000 to scale, otherwise it doesn't move very fast
-		double xDeltaV = (this.getXForce()/this.getMass())*timeStep*1000;
-		double yDeltaV = (this.getYForce()/this.getMass())*timeStep*1000;
-		double xDeltaP = ((this.getxVel() + (xDeltaV/2)))*timeStep*1000;
-		double yDeltaP = ((this.getyVel() + (yDeltaV/2)))*timeStep*1000;
-		
-		
-	//	set this body's velocity
+		// multiplied by 1000 to scale, otherwise it doesn't move very fast
+		double xDeltaV = (this.getXForce() / this.getMass()) * timeStep * 1000;
+		double yDeltaV = (this.getYForce() / this.getMass()) * timeStep * 1000;
+		double xDeltaP = ((this.getxVel() + (xDeltaV * .5))) * timeStep * 1000;
+		double yDeltaP = ((this.getyVel() + (yDeltaV * .5))) * timeStep * 1000;
+
+		// set this body's velocity
 		this.setxVel(this.getxVel() + xDeltaV);
 		this.setyVel(this.getyVel() + yDeltaV);
-		
-//		set this body's position
+
+		// set this body's position
 		this.setxPos(this.getxPos() + xDeltaP);
 		this.setyPos(this.getyPos() + yDeltaP);
-		
+
 		this.setXForce(0.0);
 		this.setYForce(0.0);
 	}
@@ -266,11 +279,13 @@ public class MassiveBody extends Observable{
 
 		this.xPos = xPos;
 		this.yPos = yPos;
+		if (wallCollisions) {
+			checkForWallCollision();
+		}
 		setChanged();
 		notifyObservers();
 	}
-	
-	
+
 	/**
 	 * @return the yPos
 	 */
@@ -390,7 +405,7 @@ public class MassiveBody extends Observable{
 	public void setMass(double mass) {
 		this.mass = mass;
 	}
-	
+
 	/**
 	 * @return the force for x
 	 */
@@ -404,8 +419,8 @@ public class MassiveBody extends Observable{
 	 */
 	public void setXForce(double force) {
 		this.xForce = force;
-	}	
-	
+	}
+
 	/**
 	 * @return the force for y
 	 */
@@ -420,19 +435,19 @@ public class MassiveBody extends Observable{
 	public void setYForce(double force) {
 		this.yForce = force;
 	}
-	
-	public int getName(){
+
+	public int getName() {
 		return this.name;
 	}
-	
+
 	public void setName(int name) {
 		this.name = name;
 	}
-	
+
 	public double getXPosForDrawing() {
 		return this.xPos - this.radius;
 	}
-	
+
 	public double getYPosForDrawing() {
 		return this.yPos - this.radius;
 	}
@@ -475,6 +490,38 @@ public class MassiveBody extends Observable{
 		int G = (int) (Math.random() * 256);
 		int B = (int) (Math.random() * 256);
 		return new Color(R, G, B);
+	}
+
+	public void checkForWallCollision() {
+
+		if (xPos < (radius)) {
+			xVel *= -1;
+			xPos = 0.1 + radius;
+		}
+
+		else if (xPos > (WIDTH - radius)) {
+			xVel *= -1;
+			xPos = WIDTH - radius - 0.1;
+		}
+
+		if (yPos < (radius)) {
+			yVel *= -1;
+			yPos = 0.1 + radius;
+		}
+
+		else if (yPos > (HEIGHT - radius - 25)) {
+			yVel *= -1;
+			yPos = HEIGHT - radius - 0.1 - 25;
+		}
+
+	}
+
+	public int getCollisions() {
+		return numCollisions;
+	}
+	
+	public void incrementCollisions() {
+		numCollisions++;
 	}
 
 }

@@ -1,5 +1,4 @@
 import java.awt.geom.Point2D;
-import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 
 import javax.swing.JFrame;
@@ -11,40 +10,59 @@ public class RenderFrame {
 	static int timeStep;
 	
 	public static void main(String[] args) {
-		JFrame window = new JFrame("The Window Title");
-		
+		JFrame window = new JFrame("2-D Collisons on N-Bodies");
 
-		
-		boolean random = false;
-		if ( args.length > 4 && args[0].equals( "-r" ) ) {
-			random = true;
-		}
-		
-		if (args.length == 0) {
-			System.out.println("More arguments needed!");
+		// If not enough arguments are given
+		if (args.length < 4) {
+			System.out.println("Function must be called using the following syntax:");
+			System.out.println("nBodies <numberOfWorkers> <numberOfBodies> <massOfBodies> <numberOfTimeSteps>");
+			System.out.println("followed by any elective options (-r, -wc, etc.)");
 			System.exit(1);
 		}
 		
+		// Parse command-line arguments
 		int numWorkers = Integer.parseInt(args[0]);
 		int numBodies = Integer.parseInt(args[1]);
-		Worker[] workers = new Worker[numWorkers];
-		Point2D[][] forceMatrix = new Point2D[numWorkers][numBodies];
+		int bodyMass = Integer.parseInt(args[2]);
+		int numTimeSteps = Integer.parseInt(args[3]);
+
+		boolean random = false;
+		boolean wallCollisions = false;
 		
-		BodyCollector bodies = new BodyCollector(random, numBodies);
+		// Determine if bodies are to be placed randomly or if wall collisions are to be registered
+		if ( args.length > 4 ) {
+			for (int i = 0; i < args.length; i++) {
+				if (args[i].equals("-r")) {
+					random = true;
+				}
+								
+				if (args[i].equals("-wc")) {
+					wallCollisions = true;
+				}
+			}
+		}
+				
+		BodyCollector bodies = new BodyCollector(random, numBodies, wallCollisions, bodyMass, numTimeSteps);
 		
 //		figure out if this is a sequential program or a parallel one
 		if(numWorkers == 1) {
 			
 //			set up the sequential panel
-			RenderingPanelSequential mainPanel = new RenderingPanelSequential(bodies);	
+			RenderingPanelSequential mainPanel = new RenderingPanelSequential(bodies);
+			
 			bodies.addObserver(mainPanel);
 			window.setContentPane(mainPanel);
 		    window.setSize(WIDTH,HEIGHT);
 		    window.setLocation(100, 100);
+		    window.setAlwaysOnTop(true);
 		    window.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		    window.setVisible(true);
+		    		
 		} else {
+			
+			Worker[] workers = new Worker[numWorkers];				// Create an array in which to store the threads.
 //			initialize force matrix, parallel JPanel, and start workers
+			Point2D[][] forceMatrix = new Point2D[numWorkers][numBodies];
 			
 			
 //			initialize the force matrix to 0.0 in every cell
@@ -80,23 +98,25 @@ public class RenderFrame {
 					endBody = startBody + numBodiesPerWorker - 1;
 				}
 				
-				workers[i] = new Worker(i, bodies, forceMatrix, startBody, endBody+1, barrier, numWorkers);		// FIXME: Might be endBody (not +1)
+				workers[i] = new Worker(i, bodies, forceMatrix, startBody, endBody+1, barrier, numWorkers);
 				numBodiesDistributed = endBody + 1;
 				
 			}
 						
-			
-			// Timer start TODO:
+			long startTime = System.nanoTime();
+
 			// Start each worker
 			for (int i = 0; i < workers.length; i++) {
 				workers[i].start();
 			}
 			
 			
+//			TODO decide if this should go before starting the workers
 //			initialize the correct panel
 		    window.setSize(WIDTH,HEIGHT);
 		    window.setLocation(100, 100);
 		    window.setContentPane(mainPanel);
+		    window.setAlwaysOnTop(true);
 		    window.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		    window.setVisible(true);
 			
@@ -109,7 +129,19 @@ public class RenderFrame {
 				}
 		    }
 		    
-		    // TODO: Timer stop;
+		    // Timer stop
+		    long endTime = System.nanoTime();
+		    
+//		    calculate computation time
+		    long seconds = (long) ((endTime-startTime) * .0000000001);
+		    long milliseconds = (long) (((endTime-startTime) % 1000000000) * .0000001);
+		    
+//		    print out computation time
+		    System.out.println("computation time: " + seconds + " seconds " + milliseconds + " milliseconds");
+		    
+//		    print out number of collisions
+		    System.out.println("number of collisions: " + bodies.getTotalCollisions());
+
 		}
 	    
 	}

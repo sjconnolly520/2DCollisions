@@ -16,6 +16,7 @@ public class BodyCollector extends Observable{
 	private Scanner scanner = new Scanner(System.in);
 	final double minMass = 50000, maxMass = 500000;
 	final double minRadius = 10, maxRadius = 200;
+	private boolean wallCollisions;
 	final int WIDTH = 620, HEIGHT = 520;
 	
 	/**
@@ -24,28 +25,18 @@ public class BodyCollector extends Observable{
 	 * 
 	 * @param randomize		Boolean value describing whether the user wants to generate MassiveBody objects randomly or generate them based on specific values. 
 	 */
-	public BodyCollector(boolean randomize, int numBodies) {
+	public BodyCollector(boolean randomize, int numBodies, boolean wallCollisions, int mass, int timeSteps) {
 				
-//		NOTE extra questions added by Bree
-//		System.out.print("How many workers do you want?: ");
-//		numWorkers = scanner.nextInt();
-		
-//		System.out.print("How many bodies would you like to simulate?: ");
-//		numBodies = scanner.nextInt();
 		this.numBodies = numBodies;
+		this.mass = mass;
+		this.numSteps = timeSteps;
+		this.wallCollisions = wallCollisions;
 		
 		System.out.print("What is the radius of the bodies (in meters)?: ");
 		radius = scanner.nextFloat();
-		
-		System.out.print("What is the mass of the bodies (in grams)?: ");
-		mass = scanner.nextFloat();
-		
+
 		System.out.print("What time step do you want (in ms)?: ");
-		timeStep = scanner.nextInt();
-		
-		System.out.print("How many time steps do you want?: ");
-		numSteps = scanner.nextInt();
-		
+		this.timeStep = scanner.nextInt();
 		
 		if (randomize) {
 			generateRandomBodies();
@@ -61,16 +52,11 @@ public class BodyCollector extends Observable{
 	private void getUserBodyData() {
 		
 		for (int i = 0; i < numBodies; i++) {
-			MassiveBody newBody = new MassiveBody(timeStep, i);
+			MassiveBody newBody = new MassiveBody(timeStep, i, wallCollisions);
 			newBody.setName(i);
 			
 			// User prompts
-//			System.out.print("What is the radius of body " + (i+1) + " (in meters)?: ");
-//			float radius = scanner.nextFloat();
 			newBody.setRadius(radius);
-			
-//			System.out.print("What is the mass of body " + (i+1) + " (in grams)?: ");
-//			float mass = scanner.nextFloat();
 			newBody.setMass(mass);
 			
 			System.out.print("What is the x location of body " + (i+1) + "?: ");
@@ -108,18 +94,15 @@ public class BodyCollector extends Observable{
 		Random rng = new Random();			// Random number generator
 		
 		for (int i = 0; i < numBodies; i++) {
-			MassiveBody newBody = new MassiveBody(timeStep, i);
+			MassiveBody newBody = new MassiveBody(timeStep, i, wallCollisions);
 			
-			// Generate random value for MassiveBody's mass
-			newBody.setMass(rng.nextDouble() * (maxMass - minMass) + minMass);
-			
-			// Generate random value for MassiveBody's radius
-			double randRadius = rng.nextDouble() * (maxRadius - minRadius) + minRadius;
-			newBody.setRadius(randRadius);
+			// Use the given values for mass and radius
+			newBody.setMass(mass);
+			newBody.setRadius(radius);
 			
 			// Calculate bounding area for this MassiveBody object
-			double minXLocForThisBody = randRadius + 1, maxXLocForThisBody = WIDTH - randRadius - 1;
-			double minYLocForThisBody = randRadius + 1, maxYLocForThisBody = HEIGHT - randRadius - 1;
+			double minXLocForThisBody = radius + 1, maxXLocForThisBody = WIDTH - radius - 1;
+			double minYLocForThisBody = radius + 1, maxYLocForThisBody = HEIGHT - radius - 1;
 			
 			// Generate random values for MassiveBody's x- and y-locations.
 			double xLoc = rng.nextDouble() * (maxXLocForThisBody - minXLocForThisBody) + minXLocForThisBody;
@@ -223,6 +206,19 @@ public class BodyCollector extends Observable{
 	
 	public double getMass() {
 		return mass;
+	}
+	
+	public boolean wallCollisonsActive() {
+		return wallCollisions;
+	}
+	
+	public int getTotalCollisions() {
+		int totalCollisions = 0;
+		for (MassiveBody body : bodies) {
+			totalCollisions += body.getCollisions();
+		}
+		
+		return totalCollisions;
 	}
 
 }
