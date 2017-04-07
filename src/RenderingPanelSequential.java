@@ -108,8 +108,6 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 		    System.out.println("computation time: " + seconds + " seconds " + milliseconds + " milliseconds");
 		    System.out.println("number of collisions: " + tempBodies.getTotalCollisions());
 		    
-		    
-		    
 		}
 		
 	}
