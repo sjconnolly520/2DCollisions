@@ -13,33 +13,40 @@ public class RenderFrame {
 	public static void main(String[] args) {
 		JFrame window = new JFrame("The Window Title");
 		
-
-		if (args.length == 0) {
-			System.out.println("More arguments needed!");
+		// If not enough arguments are given
+		if (args.length < 4) {
+			System.out.println("Function must be called using the following syntax:");
+			System.out.println("nBodies <numberOfWorkers> <numberOfBodies> <massOfBodies> <numberOfTimeSteps>");
+			System.out.println("followed by any elective options (-r, -wc, etc.)");
 			System.exit(1);
 		}
+		
+		// Parse command-line arguments
+		int numWorkers = Integer.parseInt(args[0]);
+		int numBodies = Integer.parseInt(args[1]);
+		int bodyMass = Integer.parseInt(args[2]);
+		int numTimeSteps = Integer.parseInt(args[3]);
 
 		boolean random = false;
 		boolean wallCollisions = false;
+		
+		// Determine if bodies are to be placed randomly or if wall collisions are to be registered
 		if ( args.length > 4 ) {
 			for (int i = 0; i < args.length; i++) {
 				if (args[i].equals("-r")) {
 					random = true;
 				}
-				
+								
 				if (args[i].equals("-wc")) {
 					wallCollisions = true;
 				}
 			}
 		}
+				
 		
-		wallCollisions = true; //FIXME: Delete me. I'm here for testing.
-		
-		int numWorkers = Integer.parseInt(args[0]);
-		Worker[] workers = new Worker[numWorkers];
-		int numBodies = Integer.parseInt(args[1]);
-		Point2D[][] forceMatrix = new Point2D[numWorkers][numBodies];
-		BodyCollector bodies = new BodyCollector(random, numBodies, wallCollisions);
+		Worker[] workers = new Worker[numWorkers];				// Create an array in which to store the threads.
+		Point2D[][] forceMatrix = new Point2D[numWorkers][numBodies];	
+		BodyCollector bodies = new BodyCollector(random, numBodies, wallCollisions, bodyMass, numTimeSteps);
 		
 //		figure out if this is a sequential program or a parallel one
 		if(numWorkers == 1) {
@@ -51,6 +58,7 @@ public class RenderFrame {
 		    window.setSize(WIDTH,HEIGHT);
 		    window.setLocation(100, 100);
 		    window.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+		    window.setAlwaysOnTop(true);
 		    window.setVisible(true);
 		} else {
 //			initialize force matrix, parallel JPanel, and start workers
@@ -107,6 +115,7 @@ public class RenderFrame {
 		    window.setSize(WIDTH,HEIGHT);
 		    window.setLocation(100, 100);
 		    window.setContentPane(mainPanel);
+		    window.setAlwaysOnTop(true);
 		    window.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		    window.setVisible(true);
 			

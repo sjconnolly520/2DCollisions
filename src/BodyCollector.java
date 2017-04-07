@@ -6,6 +6,8 @@ import java.util.Scanner;
 
 import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
+import com.sun.xml.internal.ws.wsdl.parser.InaccessibleWSDLException;
+
 public class BodyCollector extends Observable{
 	
 	private int timeStep;              // time step for this simulation
@@ -27,23 +29,18 @@ public class BodyCollector extends Observable{
 	 * 
 	 * @param randomize		Boolean value describing whether the user wants to generate MassiveBody objects randomly or generate them based on specific values. 
 	 */
-	public BodyCollector(boolean randomize, int numBodies, boolean wallCollisions) {
+	public BodyCollector(boolean randomize, int numBodies, boolean wallCollisions, int mass, int timeSteps) {
 				
 		this.numBodies = numBodies;
+		this.mass = mass;
+		this.numSteps = timeSteps;
+		this.wallCollisions = wallCollisions;
 		
 		System.out.print("What is the radius of the bodies (in meters)?: ");
 		radius = scanner.nextFloat();
-		
-		System.out.print("What is the mass of the bodies (in grams)?: ");
-		mass = scanner.nextFloat();
-		
+
 		System.out.print("What time step do you want (in ms)?: ");
-		timeStep = scanner.nextInt();
-		
-		System.out.print("How many time steps do you want?: ");
-		numSteps = scanner.nextInt();
-		
-		this.wallCollisions = wallCollisions;
+		this.timeStep = scanner.nextInt();
 		
 		if (randomize) {
 			generateRandomBodies();
@@ -64,7 +61,6 @@ public class BodyCollector extends Observable{
 			
 			// User prompts
 			newBody.setRadius(radius);
-			
 			newBody.setMass(mass);
 			
 			System.out.print("What is the x location of body " + (i+1) + "?: ");
@@ -104,16 +100,13 @@ public class BodyCollector extends Observable{
 		for (int i = 0; i < numBodies; i++) {
 			MassiveBody newBody = new MassiveBody(timeStep, i, wallCollisions);
 			
-			// Generate random value for MassiveBody's mass
-			newBody.setMass(rng.nextDouble() * (maxMass - minMass) + minMass);
-			
-			// Generate random value for MassiveBody's radius
-			double randRadius = rng.nextDouble() * (maxRadius - minRadius) + minRadius;
-			newBody.setRadius(randRadius);
+			// Use the given values for mass and radius
+			newBody.setMass(mass);
+			newBody.setRadius(radius);
 			
 			// Calculate bounding area for this MassiveBody object
-			double minXLocForThisBody = randRadius + 1, maxXLocForThisBody = WIDTH - randRadius - 1;
-			double minYLocForThisBody = randRadius + 1, maxYLocForThisBody = HEIGHT - randRadius - 1;
+			double minXLocForThisBody = radius + 1, maxXLocForThisBody = WIDTH - radius - 1;
+			double minYLocForThisBody = radius + 1, maxYLocForThisBody = HEIGHT - radius - 1;
 			
 			// Generate random values for MassiveBody's x- and y-locations.
 			double xLoc = rng.nextDouble() * (maxXLocForThisBody - minXLocForThisBody) + minXLocForThisBody;
