@@ -1,4 +1,9 @@
 import java.awt.geom.Point2D;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CyclicBarrier;
 
 import javax.swing.JFrame;
@@ -111,7 +116,6 @@ public class RenderFrame {
 			}
 			
 			
-//			TODO decide if this should go before starting the workers
 //			initialize the correct panel
 		    window.setSize(WIDTH,HEIGHT);
 		    window.setLocation(100, 100);
@@ -128,6 +132,31 @@ public class RenderFrame {
 					e.printStackTrace();
 				}
 		    }
+		  
+		    
+		    try {
+		    	
+				FileWriter fw = new FileWriter("finalOutput.txt");
+				BufferedWriter bw = new BufferedWriter(fw);
+				List<MassiveBody> bodiesList = bodies.getListOfBodies();
+				
+				for (int i = 0; i < numBodies; i++) {
+					MassiveBody currBody = bodiesList.get(i);
+					String str = "Body " + i + ": \n\tPosition = (" + currBody.getxPos() + ", " + currBody.getyPos() + ")"
+							+ "\n\tVelocity = (" + currBody.getxVel() + ", " + currBody.getyVel() + ")" +"\n\n";
+					bw.write(str);
+				}
+				
+				bw.close();
+				fw.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    
+		    
+		    
+		    
 		    
 		    // Timer stop
 		    long endTime = System.nanoTime();
