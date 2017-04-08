@@ -11,7 +11,6 @@ public class MassiveBody extends Observable {
 	private double xPos, yPos; // position
 	private double radius; // dimensions for drawing
 	private double xVel = 0, yVel = 0; // velocities along x, y axes
-	private double xAcc = 0, yAcc = 0; // accelerations along x, y axes
 	private double mass = 1; // default = 1
 	private static final double G = 6.67 * Math.pow(10, -11); // Universal
 																// Gravitational
@@ -21,15 +20,10 @@ public class MassiveBody extends Observable {
 										// simulation; Likely just for testing
 	private boolean wallCollisions;
 	private int numCollisions;
-
-	// NOTE added by Bree
 	private double xForce = 0, yForce = 0; // initial forces
-	private int name; // TODO for identifying a body
-	private int timeStep; // the specified timeStep
+	private int name;                      // for identifying a body
+	private int timeStep;                  // the specified timeStep
 
-	// NOTE Bree added the timeStep to the constructor so it could do the proper
-	// calculations
-	// in the added functions
 	public MassiveBody(int timeStep, int name, boolean wallCollisions) {
 		color = generateRandomColor();
 		this.timeStep = timeStep;
@@ -86,48 +80,6 @@ public class MassiveBody extends Observable {
 
 	/**
 	 * 
-	 * Calculates the acceleration of MassiveBody objects due to the gravity of
-	 * other MassiveBody objects.
-	 * 
-	 * @param other
-	 *            The MassiveBody object which is exerting influence on this
-	 *            MassiveBody object
-	 */
-	public void calculateAcceleration(MassiveBody other) {
-
-		// Calculate distance of this from other
-		double deltaX = calculateDistX(other);
-		double deltaY = calculateDistY(other);
-		double distance = calculateDistance(deltaX, deltaY);
-
-		// Calculate axial forces on objects due to gravity
-		double gravForceMag = (G * mass * other.getMass()) / (distance * distance);
-		double forceX = Math.abs(gravForceMag * (deltaX / distance));
-		double forceY = Math.abs(gravForceMag * (deltaY / distance));
-
-		// Calculate axial accelerations due to gravity and add to current axial
-		// accelerations
-		// FIXME: Stephen feels certain that this can be made more efficient.
-		if (this.getxPos() < other.getxPos()) {
-			this.addToXAcc(forceX / this.getMass());
-			other.addToXAcc(-forceX / other.getMass());
-		} else {
-			this.addToXAcc(-forceX / this.getMass());
-			other.addToXAcc(forceX / other.getMass());
-		}
-
-		if (this.getyPos() < other.getyPos()) {
-			this.addToYAcc(forceY / this.getMass());
-			other.addToYAcc(-forceY / other.getMass());
-		} else {
-			this.addToYAcc(-forceY / this.getMass());
-			other.addToYAcc(forceY / other.getMass());
-		}
-
-	}
-
-	/**
-	 * 
 	 * Calculates the forces affecting MassiveBody objects due to the presence
 	 * of other MassiveBody objects. ADDED BY BREE TO MIRROR THE BOOK EXAMPLE
 	 * 
@@ -139,17 +91,12 @@ public class MassiveBody extends Observable {
 
 		double distance = newCalculateDistance(other);
 
-		// calculate whether distance < some small number here, and handle
+		// calculate whether distance < 2r here, and handle
 		// accordingly
-		// TODO figure out what this small number should be
 		if (distance <= (2 * radius)) {
-			System.out.println("collision detected");
-			this.numCollisions++;
-			// TODO back up a time step?
-			// recalculate velocities using collision equations
 
-			// what is the distance? is it < 2r? if so, reset positions as if
-			// they were 2r apart
+//			increment counter for collisions for this body
+			this.numCollisions++;
 
 			// compute x- and y-velocities for this body after collision
 			double firstXVel = this.getxVel();
@@ -211,35 +158,6 @@ public class MassiveBody extends Observable {
 
 	/**
 	 * 
-	 * Updates the axial velocities of this MassiveBody object based on the
-	 * axial accelerations of the object. Once new velocities are calculated,
-	 * accelerations are set to 0.0.
-	 * 
-	 */
-	public void calculateVelocity() {
-
-		setxVel(getxVel() + getxAcc() * 1000000); // Times 1000000 for rendering
-													// purposes
-		setyVel(getyVel() + getyAcc() * 1000000);
-
-		// Set the acceleration to 0 before the next set of calculations occur.
-		setxAcc(0.0);
-		setyAcc(0.0);
-	}
-
-	/**
-	 * 
-	 * Updates the axial positions of this MassiveBody object based on the axial
-	 * velocities of the object.
-	 * 
-	 */
-	public void calculatePosition() {
-		setxPos(getxPos() + getxVel());
-		setyPos(getyPos() + getyVel());
-	}
-
-	/**
-	 * 
 	 * Updates the velocities and axial positions of this MassiveBody object
 	 * based on the forces affecting the object. ADDED BY BREE TO REFLECT THE
 	 * BOOK EXAMPLE
@@ -262,14 +180,6 @@ public class MassiveBody extends Observable {
 
 		this.setXForce(0.0);
 		this.setYForce(0.0);
-	}
-
-	public void addToXAcc(double changeInAcc) {
-		xAcc += changeInAcc;
-	}
-
-	public void addToYAcc(double chanceInAcc) {
-		yAcc += chanceInAcc;
 	}
 
 	///////////////////////////
@@ -359,36 +269,6 @@ public class MassiveBody extends Observable {
 	 */
 	public void setyVel(double yVel) {
 		this.yVel = yVel;
-	}
-
-	/**
-	 * @return the xAcc
-	 */
-	public double getxAcc() {
-		return xAcc;
-	}
-
-	/**
-	 * @param xAcc
-	 *            the xAcc to set
-	 */
-	public void setxAcc(double xAcc) {
-		this.xAcc = xAcc;
-	}
-
-	/**
-	 * @return the yAcc
-	 */
-	public double getyAcc() {
-		return yAcc;
-	}
-
-	/**
-	 * @param yAcc
-	 *            the yAcc to set
-	 */
-	public void setyAcc(double yAcc) {
-		this.yAcc = yAcc;
 	}
 
 	/**

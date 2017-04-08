@@ -81,6 +81,9 @@ public class RenderFrame {
 			// Create Barrier
 			CyclicBarrier barrier = new CyclicBarrier(numWorkers);
 			
+//			create array to hold barrier timings
+			long[] barrierTimings = new long[numWorkers];
+			
 			// Distribute MassiveBody objects "evenly" across workers
 			int numBodiesPerWorker = numBodies / numWorkers;
 			int numBodiesDistributed = 0;
@@ -98,7 +101,7 @@ public class RenderFrame {
 					endBody = startBody + numBodiesPerWorker - 1;
 				}
 				
-				workers[i] = new Worker(i, bodies, forceMatrix, startBody, endBody+1, barrier, numWorkers);
+				workers[i] = new Worker(i, bodies, forceMatrix, startBody, endBody+1, barrier, numWorkers, barrierTimings);
 				numBodiesDistributed = endBody + 1;
 				
 			}
@@ -110,8 +113,6 @@ public class RenderFrame {
 				workers[i].start();
 			}
 			
-			
-//			TODO decide if this should go before starting the workers
 //			initialize the correct panel
 		    window.setSize(WIDTH,HEIGHT);
 		    window.setLocation(100, 100);
@@ -119,31 +120,36 @@ public class RenderFrame {
 		    window.setAlwaysOnTop(true);
 		    window.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 		    window.setVisible(true);
-			
+		    
+		    long totalBarrierTime = 0;
 //		    wait for the Workers to finish
 		    for (int i = 0; i < numWorkers; i++) {
 		    	try {
-					workers[i].join();
+		    		workers[i].join();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
+		    }
+		    
+//		    calculate total time spent on barriers
+		    for(long timing : barrierTimings) {
+		    	totalBarrierTime += timing;
 		    }
 		    
 		    // Timer stop
 		    long endTime = System.nanoTime();
 		    
 //		    calculate computation time
-		    long seconds = (long) ((endTime-startTime) * .0000000001);
-		    long milliseconds = (long) (((endTime-startTime) % 1000000000) * .0000001);
+		    long seconds = (long) ((endTime-startTime) * 0.000000001);
+		    long milliseconds = (long) (((endTime-startTime) % 1000000000) * 0.000001);
 		    
 //		    print out computation time
 		    System.out.println("computation time: " + seconds + " seconds " + milliseconds + " milliseconds");
 		    
 //		    print out number of collisions
 		    System.out.println("number of collisions: " + bodies.getTotalCollisions());
-
-		}
-	    
+		    
+		    System.out.println("percentage of time spent on barriers: " + (totalBarrierTime/(endTime-startTime)) * 100 + "%");
+		}  
 	}
-
 }

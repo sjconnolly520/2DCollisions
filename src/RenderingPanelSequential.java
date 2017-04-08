@@ -103,8 +103,8 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 			
 //			print out computation time and number of collisions
 		    long endTime = System.nanoTime();
-		    long seconds = (long) ((endTime-startTime) * .0000000001);
-		    long milliseconds = (long) (((endTime-startTime) % 1000000000) * .0000001);
+		    long seconds = (long) ((endTime-startTime) * 0.000000001);
+		    long milliseconds = (long) (((endTime-startTime) % 1000000000) * 0.000001);
 		    System.out.println("computation time: " + seconds + " seconds " + milliseconds + " milliseconds");
 		    System.out.println("number of collisions: " + tempBodies.getTotalCollisions());
 		    

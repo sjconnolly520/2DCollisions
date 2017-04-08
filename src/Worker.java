@@ -15,12 +15,14 @@ public class Worker extends Thread {
 	private int numWorkers;
 	private CyclicBarrier barrier;
 	private Point2D[][] forceMatrix;
+	private long barrierTime;
+	private long[] barrierTimings;
 	private static final double G = 6.67 * Math.pow(10, -11); // Universal
 																// Gravitational
 																// Constant
 
 	public Worker(int ID, BodyCollector bodies, Point2D[][] forces, int startBody, int endBody, CyclicBarrier barrier,
-			int numWorkers) {
+			int numWorkers, long[] timings) {
 		this.ID = ID;
 		this.condVar = new Object();
 		this.collector = bodies;
@@ -32,6 +34,8 @@ public class Worker extends Thread {
 		this.endBody = endBody;
 		this.barrier = barrier;
 		this.numWorkers = numWorkers;
+		this.barrierTimings = timings;
+		barrierTime = 0;
 	}
 
 	@Override
@@ -41,7 +45,10 @@ public class Worker extends Thread {
 
 			// Wait for all threads to reconcile
 			try {
+				long startTime = System.nanoTime();
 				barrier.await();
+				long endTime = System.nanoTime();
+				barrierTime =+ (endTime - startTime);
 			} catch (InterruptedException | BrokenBarrierException e1) {
 				e1.printStackTrace();
 			}
@@ -50,7 +57,10 @@ public class Worker extends Thread {
 
 			// Wait for all threads to reconcile
 			try {
+				long startTime = System.nanoTime();
 				barrier.await();
+				long endTime = System.nanoTime();
+				barrierTime =+ (endTime - startTime);
 			} catch (InterruptedException | BrokenBarrierException e1) {
 				e1.printStackTrace();
 			}
@@ -65,6 +75,10 @@ public class Worker extends Thread {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			
+			if(i == numSteps-1) {
+				barrierTimings[ID] = this.barrierTime;
+			}
 		}
 	}
 
@@ -77,17 +91,9 @@ public class Worker extends Thread {
 				MassiveBody second = bodies.get(j);
 				double distance = calculateDistance(first, second);
 
-				// calculate whether distance < some small number here, and
-				// handle accordingly
-				// TODO figure out what this small number should be
+				// calculate whether distance <= 2r and correct for collision
 				if (distance <= (2 * collector.getRadius())) {
-					System.out.println("collision detected");
 					first.incrementCollisions();
-					// TODO back up a time step?
-					// recalculate velocities using collision equations
-
-					// what is the distance? is it < 2r? if so, reset positions
-					// as if they were 2r apart
 					
 //					set up local vars
 					double firstXVel = first.getxVel();
@@ -189,6 +195,10 @@ public class Worker extends Thread {
 			bodies.get(i).setPosXY(bodies.get(i).getxPos() + xDeltaP, bodies.get(i).getyPos() + yDeltaP);
 
 		}
+	}
+	
+	public long getBarrierTime() {
+		return this.barrierTime;
 	}
 
 }
