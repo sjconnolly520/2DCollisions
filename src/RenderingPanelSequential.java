@@ -2,6 +2,9 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -100,6 +103,25 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 		if(currentStep <= 0) {
 			System.out.println("stopping simulation");
 			timer.stop();
+			
+		    try {
+		    	
+				FileWriter fw = new FileWriter("finalOutput.txt");
+				BufferedWriter bw = new BufferedWriter(fw);
+				
+				for (int i = 0; i < bodies.size(); i++) {
+					MassiveBody currBody = bodies.get(i);
+					String str = "Body " + i + ": \n\tPosition = (" + currBody.getxPos() + ", " + currBody.getyPos() + ")"
+							+ "\n\tVelocity = (" + currBody.getxVel() + ", " + currBody.getyVel() + ")" +"\n\n";
+					bw.write(str);
+				}
+				
+				bw.close();
+				fw.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 //			print out computation time and number of collisions
 		    long endTime = System.nanoTime();
