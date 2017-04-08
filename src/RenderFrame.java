@@ -20,7 +20,7 @@ public class RenderFrame {
 		// If not enough arguments are given
 		if (args.length < 4) {
 			System.out.println("Function must be called using the following syntax:");
-			System.out.println("nBodies <numberOfWorkers> <numberOfBodies> <massOfBodies> <numberOfTimeSteps>");
+			System.out.println("RenderFrame <numberOfWorkers> <numberOfBodies> <massOfBodies> <numberOfTimeSteps>");
 			System.out.println("followed by any elective options (-r, -wc, etc.)");
 			System.exit(1);
 		}

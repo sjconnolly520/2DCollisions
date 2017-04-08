@@ -73,9 +73,6 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 			}
 			
 			for (MassiveBody body : bodies) {
-//					body.calculateVelocity();
-//					TODO done separately below
-//					body.calculatePosition();
 				body.moveBody();
 			}
 			
@@ -101,7 +98,6 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 		
 //		stop the timer after the requested number of time steps
 		if(currentStep <= 0) {
-			System.out.println("stopping simulation");
 			timer.stop();
 			
 		    try {
@@ -119,7 +115,6 @@ public class RenderingPanelSequential extends JPanel implements Observer{
 				bw.close();
 				fw.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
